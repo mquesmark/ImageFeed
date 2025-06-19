@@ -23,7 +23,7 @@ class ImagesListViewController: UIViewController {
         guard let image = UIImage(named: imageName) else { return }
         cell.cellImage.image = image
         cell.cellDate.text = dateFormatter.string(from: Date())
-        if indexPath.row % 2 == 1 {
+        if indexPath.row % 2 == 0 {
             cell.cellLike.setImage(UIImage(named: "Active"), for: .normal)
         } else {
             cell.cellLike.setImage(UIImage(named: "No Active"), for: .normal)
