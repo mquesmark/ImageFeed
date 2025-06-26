@@ -137,7 +137,7 @@
                                     <outlet property="delegate" destination="LvJ-f9-UCv" id="kd6-1J-nMR"/>
                                 </connections>
                             </scrollView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yEE-aI-DbK">
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="yEE-aI-DbK" userLabel="Backwards Button">
                                 <rect key="frame" x="8" y="67" width="48" height="48"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="48" id="MIL-sp-eeM"/>
@@ -149,12 +149,26 @@
                                     <action selector="didTapBackButton:" destination="LvJ-f9-UCv" eventType="touchUpInside" id="82W-h5-NGB"/>
                                 </connections>
                             </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="1MN-yu-qfg" userLabel="Share Button">
+                                <rect key="frame" x="171.66666666666666" y="751" width="50" height="50"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="50" id="9I4-3K-RFV"/>
+                                    <constraint firstAttribute="height" constant="50" id="zNU-ph-mIm"/>
+                                </constraints>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
+                                <state key="normal" image="Sharing"/>
+                                <connections>
+                                    <action selector="didTapShareButton:" destination="LvJ-f9-UCv" eventType="touchUpInside" id="22c-q3-VYn"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="r7b-Qe-PQB"/>
                         <color key="backgroundColor" name="YP Black (iOS)"/>
                         <constraints>
+                            <constraint firstItem="1MN-yu-qfg" firstAttribute="centerX" secondItem="r7b-Qe-PQB" secondAttribute="centerX" id="5Aj-Sg-kXw"/>
                             <constraint firstItem="r7b-Qe-PQB" firstAttribute="leading" secondItem="RYw-PL-EyU" secondAttribute="leading" id="Dp7-9g-vFf"/>
                             <constraint firstItem="yEE-aI-DbK" firstAttribute="top" secondItem="r7b-Qe-PQB" secondAttribute="top" constant="8" id="JDd-CN-8SF"/>
+                            <constraint firstItem="r7b-Qe-PQB" firstAttribute="bottom" secondItem="1MN-yu-qfg" secondAttribute="bottom" constant="17" id="NGK-9i-h5n"/>
                             <constraint firstItem="yEE-aI-DbK" firstAttribute="leading" secondItem="r7b-Qe-PQB" secondAttribute="leading" constant="8" id="Pk0-Dc-eWc"/>
                             <constraint firstAttribute="bottom" secondItem="RYw-PL-EyU" secondAttribute="bottom" id="Wrn-2L-mR7"/>
                             <constraint firstItem="r7b-Qe-PQB" firstAttribute="trailing" secondItem="RYw-PL-EyU" secondAttribute="trailing" id="Xwb-B5-Zkr"/>
@@ -278,6 +292,7 @@
         <image name="Backward" width="24" height="24"/>
         <image name="Exit" width="44" height="44"/>
         <image name="ImageCellTextBackground" width="343" height="30"/>
+        <image name="Sharing" width="51" height="50"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30" height="30"/>
         <image name="userPic" width="70" height="70"/>
