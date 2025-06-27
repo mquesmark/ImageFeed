@@ -1,17 +1,24 @@
 import UIKit
 
 final class SingleImageViewController: UIViewController {
+    
+    // MARK: - Outlets
+    
+    @IBOutlet private var imageView: UIImageView!
+    @IBOutlet var scrollView: UIScrollView!
+    
+    // MARK: - Public Properties
+    
     var image: UIImage? {
         didSet {
             guard isViewLoaded, let image else { return }
             imageView.image = image
             imageView.frame.size = image.size
-                rescaleAndCenterImageInScrollView(image: image)
+                rescaleAndCenter(image: image)
         }
     }
     
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet var scrollView: UIScrollView!
+    // MARK: - Lifecycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +28,14 @@ final class SingleImageViewController: UIViewController {
         guard let image else { return }
             imageView.image = image
             imageView.frame.size = image.size
-            rescaleAndCenterImageInScrollView(image: image)
+            rescaleAndCenter(image: image)
+        
+        let swipeBackGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeBack))
+        swipeBackGesture.direction = .down
+        view.addGestureRecognizer(swipeBackGesture)
     }
+    
+    // MARK: - Actions
     
     @IBAction func didTapBackButton(_ sender: UIButton) {
         dismiss(animated: true)
@@ -34,7 +47,27 @@ final class SingleImageViewController: UIViewController {
         present(activityVC, animated: true)
     }
     
-    private func rescaleAndCenterImageInScrollView(image: UIImage) {
+    @objc private func handleSwipeBack() {
+        dismiss(animated: true)
+    }
+}
+
+// MARK: - UIScrollViewDelegate
+
+extension SingleImageViewController: UIScrollViewDelegate {
+    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
+        imageView
+    }
+    
+    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
+        updateScrollViewInsets()
+    }
+}
+
+// MARK: - Private Methods
+
+extension SingleImageViewController {
+    private func rescaleAndCenter(image: UIImage) {
         let minZoomScale = scrollView.minimumZoomScale
         let maxZoomScale = scrollView.maximumZoomScale
         view.layoutIfNeeded()
@@ -64,14 +97,3 @@ final class SingleImageViewController: UIViewController {
         }
     }
 }
-
-extension SingleImageViewController: UIScrollViewDelegate {
-    func viewForZooming(in scrollView: UIScrollView) -> UIView? {
-        imageView
-    }
-    
-    func scrollViewDidEndZooming(_ scrollView: UIScrollView, with view: UIView?, atScale scale: CGFloat) {
-        updateScrollViewInsets()
-    }
-}
-

@@ -192,72 +192,10 @@
                     <view key="view" contentMode="scaleToFill" id="Qkf-0d-16I">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <stackView opaque="NO" contentMode="scaleAspectFit" axis="vertical" spacing="8" translatesAutoresizingMaskIntoConstraints="NO" id="cgr-zc-z9H">
-                                <rect key="frame" x="16" y="150" width="361" height="153"/>
-                                <subviews>
-                                    <stackView opaque="NO" contentMode="scaleToFill" distribution="equalSpacing" spacing="83" translatesAutoresizingMaskIntoConstraints="NO" id="xrG-tt-j4t" userLabel="Profile and Exit Stack View">
-                                        <rect key="frame" x="0.0" y="0.0" width="361" height="70"/>
-                                        <subviews>
-                                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="userPic" translatesAutoresizingMaskIntoConstraints="NO" id="bpx-yR-7b5">
-                                                <rect key="frame" x="0.0" y="0.0" width="70" height="70"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" secondItem="bpx-yR-7b5" secondAttribute="height" multiplier="1:1" id="0JR-3z-OUO"/>
-                                                    <constraint firstAttribute="width" constant="70" id="OQr-fa-azS"/>
-                                                </constraints>
-                                                <userDefinedRuntimeAttributes>
-                                                    <userDefinedRuntimeAttribute type="boolean" keyPath="keyPath" value="YES"/>
-                                                </userDefinedRuntimeAttributes>
-                                            </imageView>
-                                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WsR-bh-7n6">
-                                                <rect key="frame" x="317" y="0.0" width="44" height="70"/>
-                                                <constraints>
-                                                    <constraint firstAttribute="width" constant="44" id="kEB-qQ-HEX"/>
-                                                </constraints>
-                                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="2.2250738585072014e-308" maxY="0.0"/>
-                                                <state key="normal" image="Exit"/>
-                                                <connections>
-                                                    <action selector="exitButtonTapped:" destination="2uN-qy-bN4" eventType="touchUpInside" id="LAn-cv-THd"/>
-                                                </connections>
-                                            </button>
-                                        </subviews>
-                                    </stackView>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Екатерина Новикова" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="vl6-1v-QwV">
-                                        <rect key="frame" x="0.0" y="78" width="361" height="27.666666666666671"/>
-                                        <fontDescription key="fontDescription" type="boldSystem" pointSize="23"/>
-                                        <color key="textColor" name="YP White (iOS)"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="@ekaterina_nov" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="j7D-wR-aG8">
-                                        <rect key="frame" x="0.0" y="113.66666666666669" width="361" height="15.666666666666657"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <color key="textColor" name="YP Gray (iOS)"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Hello, world!" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="OEy-sI-DcP">
-                                        <rect key="frame" x="0.0" y="137.33333333333331" width="361" height="15.666666666666657"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="13"/>
-                                        <color key="textColor" name="YP White (iOS)"/>
-                                        <nil key="highlightedColor"/>
-                                    </label>
-                                </subviews>
-                            </stackView>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="KRW-Sx-I0n"/>
                         <color key="backgroundColor" name="YP Black (iOS)"/>
-                        <constraints>
-                            <constraint firstItem="cgr-zc-z9H" firstAttribute="top" secondItem="KRW-Sx-I0n" secondAttribute="top" constant="32" id="99z-cs-09W"/>
-                            <constraint firstItem="KRW-Sx-I0n" firstAttribute="trailing" secondItem="cgr-zc-z9H" secondAttribute="trailing" constant="16" id="CrD-BM-Ofq"/>
-                            <constraint firstItem="cgr-zc-z9H" firstAttribute="leading" secondItem="KRW-Sx-I0n" secondAttribute="leading" constant="16" id="Yc3-qo-lqc"/>
-                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="" image="tab_profile_active" id="nUF-2K-S0A"/>
-                    <connections>
-                        <outlet property="profileDescription" destination="OEy-sI-DcP" id="R2n-7U-bPu"/>
-                        <outlet property="profileId" destination="j7D-wR-aG8" id="gZs-P6-2Wt"/>
-                        <outlet property="profileName" destination="vl6-1v-QwV" id="lGu-hH-HiE"/>
-                        <outlet property="profilePic" destination="bpx-yR-7b5" id="Dg3-TI-a5e"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="ajq-lo-6bn" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -290,17 +228,12 @@
         <image name="0" width="1600" height="1059"/>
         <image name="Active Like" width="44" height="44"/>
         <image name="Backward" width="24" height="24"/>
-        <image name="Exit" width="44" height="44"/>
         <image name="ImageCellTextBackground" width="343" height="30"/>
         <image name="Sharing" width="51" height="50"/>
         <image name="tab_editorial_active" width="30" height="30"/>
         <image name="tab_profile_active" width="30" height="30"/>
-        <image name="userPic" width="70" height="70"/>
         <namedColor name="YP Black (iOS)">
             <color red="0.10196078431372549" green="0.10588235294117647" blue="0.13333333333333333" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-        </namedColor>
-        <namedColor name="YP Gray (iOS)">
-            <color red="0.68235294117647061" green="0.68627450980392157" blue="0.70588235294117652" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <namedColor name="YP White (iOS)">
             <color red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
