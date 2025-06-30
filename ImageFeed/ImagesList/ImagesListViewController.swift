@@ -1,6 +1,6 @@
 import UIKit
 
-class ImagesListViewController: UIViewController {
+final class ImagesListViewController: UIViewController {
     // MARK: - Outlets
     @IBOutlet private var tableView: UITableView!
     
@@ -40,7 +40,7 @@ class ImagesListViewController: UIViewController {
     }
     
     // MARK: - Private Methods
-    func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
+    private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let imageName = String(indexPath.row)
         guard let image = UIImage(named: imageName) else { return }
         cell.cellImage.image = image

@@ -4,8 +4,8 @@ final class SingleImageViewController: UIViewController {
     
     // MARK: - Outlets
     
-    @IBOutlet private var imageView: UIImageView!
-    @IBOutlet var scrollView: UIScrollView!
+    @IBOutlet private weak var imageView: UIImageView!
+    @IBOutlet private weak var scrollView: UIScrollView!
     
     // MARK: - Public Properties
     
@@ -37,10 +37,10 @@ final class SingleImageViewController: UIViewController {
     
     // MARK: - Actions
     
-    @IBAction func didTapBackButton(_ sender: UIButton) {
+    @IBAction private func didTapBackButton(_ sender: UIButton) {
         dismiss(animated: true)
     }
-    @IBAction func didTapShareButton(_ sender: UIButton) {
+    @IBAction private func didTapShareButton(_ sender: UIButton) {
         guard let image else { return }
         
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)

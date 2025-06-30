@@ -1,6 +1,6 @@
 import UIKit
 
-class ProfileViewController: UIViewController {
+final class ProfileViewController: UIViewController {
     
     private let userPicImageView = UIImageView()
     private let personNameLabel = UILabel()
@@ -15,9 +15,10 @@ class ProfileViewController: UIViewController {
     }
 
     private func setupViewElements() {
-        userPicImageView.image = UIImage(named: "userPic")
         userPicImageView.translatesAutoresizingMaskIntoConstraints = false
-
+        userPicImageView.image = UIImage(named: "userPic")
+        userPicImageView.clipsToBounds = true
+        
         personNameLabel.text = "Екатерина Новикова"
         personNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
         personNameLabel.textColor = UIColor(named: "YP White (iOS)")
@@ -64,5 +65,9 @@ class ProfileViewController: UIViewController {
             exitButton.heightAnchor.constraint(equalToConstant: 44),
             exitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
         ])
+        
+        DispatchQueue.main.async {
+            self.userPicImageView.layer.cornerRadius = self.userPicImageView.bounds.height / 2
+        }
     }
 }
