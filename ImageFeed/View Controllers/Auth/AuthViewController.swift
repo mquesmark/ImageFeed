@@ -1,10 +1,18 @@
 import UIKit
 
+protocol AuthViewControllerDelegate: AnyObject {
+    func didAuthenticate(_ vc: AuthViewController)
+}
+
 final class AuthViewController: UIViewController {
+    
+    weak var delegate: AuthViewControllerDelegate?
     
     private let loginButton = UIButton()
     private let unsplashLogo = UIImageView()
     private let showWebViewSegueIdentifier = "ShowWebView"
+    
+    private let oauth2Service = OAuth2Service.shared
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -62,11 +70,25 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
-        dismiss(animated: true)
+        navigationController?.popViewController(animated: true)
+
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
+            guard let self else { return }
+
+            self.oauth2Service.fetchOAuthToken(code: code) { result in
+                switch result {
+                case .success(let token):
+                    print("Токен успешно получен: \(token)")
+                    self.delegate?.didAuthenticate(self)
+                case .failure(let error):
+                    print("Ошибка при получении токена: \(error)")
+                }
+            }
+        }
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
-        //
+        dismiss(animated: true)
     }
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
