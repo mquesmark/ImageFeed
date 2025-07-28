@@ -35,6 +35,10 @@ final class ProfileViewController: UIViewController {
         profileDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
 
         exitButton.setImage(UIImage(named: "Exit"), for: .normal)
+        exitButton.addAction(UIAction { _ in
+            OAuth2TokenStorage().clearTokenKey()
+            WebViewViewController.clearWebViewData {exit(0)}
+        }, for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
 
         view.addSubview(userPicImageView)
