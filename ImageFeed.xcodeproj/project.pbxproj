@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		459FEA1F2E3028E5004BF68A /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 459FEA1D2E3028DC004BF68A /* WebKit.framework */; };
+		45D6CE902E376FCC0004576D /* ProgressHUD in Frameworks */ = {isa = PBXBuildFile; productRef = 45D6CE8F2E376FCC0004576D /* ProgressHUD */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -61,6 +62,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				459FEA1F2E3028E5004BF68A /* WebKit.framework in Frameworks */,
+				45D6CE902E376FCC0004576D /* ProgressHUD in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,6 +130,7 @@
 			);
 			name = ImageFeed;
 			packageProductDependencies = (
+				45D6CE8F2E376FCC0004576D /* ProgressHUD */,
 			);
 			productName = ImageFeed;
 			productReference = 4545C7542DFF113400ECBCE9 /* ImageFeed.app */;
@@ -205,6 +208,9 @@
 			);
 			mainGroup = 4545C74B2DFF113400ECBCE9;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				45D6CE8E2E376DDB0004576D /* XCRemoteSwiftPackageReference "ProgressHUD" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 4545C7552DFF113400ECBCE9 /* Products */;
 			projectDirPath = "";
@@ -578,6 +584,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		45D6CE8E2E376DDB0004576D /* XCRemoteSwiftPackageReference "ProgressHUD" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/relatedcode/ProgressHUD";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 14.1.4;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		45D6CE8F2E376FCC0004576D /* ProgressHUD */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 45D6CE8E2E376DDB0004576D /* XCRemoteSwiftPackageReference "ProgressHUD" */;
+			productName = ProgressHUD;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 4545C74C2DFF113400ECBCE9 /* Project object */;
 }

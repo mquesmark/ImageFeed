@@ -57,7 +57,7 @@ final class WebViewViewController: UIViewController {
         progressView.setProgress(Float(webView.estimatedProgress), animated: true)
         if fabs(webView.estimatedProgress - 1.0) <= 0.0001 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.25, animations: {
                     self.progressView.alpha = 0.0
                 }) { _ in
                     self.progressView.setProgress(0.0, animated: false)
@@ -66,6 +66,7 @@ final class WebViewViewController: UIViewController {
             }
         } else {
             progressView.isHidden = false
+            progressView.progressTintColor = .ypBlackIOS
             progressView.alpha = 1.0
         }
     }

@@ -1,4 +1,5 @@
 import UIKit
+import ProgressHUD
 
 protocol AuthViewControllerDelegate: AnyObject {
     func didAuthenticate(_ vc: AuthViewController)
@@ -40,6 +41,11 @@ final class AuthViewController: UIViewController {
             self?.performSegue(withIdentifier: self?.showWebViewSegueIdentifier ?? "", sender: nil)
         }
         loginButton.addAction(action, for: .touchUpInside)
+        
+
+        ProgressHUD.animationType = .sfSymbolBounce
+        ProgressHUD.animationSymbol = "key.icloud"
+        ProgressHUD.colorAnimation = .ypBlackIOS
     }
     
     private func setConstraints() {
@@ -71,11 +77,13 @@ final class AuthViewController: UIViewController {
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         navigationController?.popViewController(animated: true)
-
+        ProgressHUD.animate("Обработка авторизации")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
 
             self.oauth2Service.fetchOAuthToken(code: code) { result in
+                
+                ProgressHUD.dismiss()
                 switch result {
                 case .success(let token):
                     print("Токен успешно получен: \(token)")
