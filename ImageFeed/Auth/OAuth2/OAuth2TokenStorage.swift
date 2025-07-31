@@ -1,6 +1,8 @@
 import Foundation
 
 final class OAuth2TokenStorage {
+    static let shared = OAuth2TokenStorage()
+    
     private let tokenKey = "OAuth2Token"
     
     var token: String? {
@@ -15,4 +17,5 @@ final class OAuth2TokenStorage {
     func clearTokenKey() {
         UserDefaults.standard.removeObject(forKey: tokenKey)
     }
+    private init() {}
 }

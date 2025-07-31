@@ -39,7 +39,7 @@
 		4545C77C2DFF113500ECBCE9 /* Exceptions for "ImageFeed" folder in "ImageFeed" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
-				Info.plist,
+				App/Info.plist,
 			);
 			target = 4545C7532DFF113400ECBCE9 /* ImageFeed */;
 		};

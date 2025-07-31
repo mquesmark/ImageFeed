@@ -3,7 +3,7 @@ import Foundation
 final class OAuth2Service {
     static let shared = OAuth2Service()
     
-    private let dataStorage = OAuth2TokenStorage()
+    private let dataStorage = OAuth2TokenStorage.shared
     private let urlSession = URLSession.shared
     
     private var task: URLSessionTask?
@@ -43,36 +43,32 @@ final class OAuth2Service {
         if let body = request.httpBody {
             print("Тело запроса: \(String(data: body, encoding: .utf8) ?? "не удалось декодировать")")
         }
-        
-        let task = urlSession.dataTask(with: request) { [weak self] data, response, error in
-            DispatchQueue.main.async { //12
-                NetworkClient.shared.fetch(request: request) { result in
-                    switch result {
-                    case .success(let data):
-                        print("Сырые данные ответа: \(String(data: data, encoding: .utf8) ?? "не удалось декодировать")")
-                        do {
-                            let decoded = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                            self?.authToken = decoded.accessToken
-                            completion(.success(decoded.accessToken))
-                        } catch {
-                            print("JSON decoding failed: \(error)")
-                            completion(.failure(AuthServiceError.networkError(error)))
-                        }
-                    case .failure(let error):
-                        print("Network error: \(error)")
-                        completion(.failure(error))
-                    }
+
+        task = NetworkClient.shared.fetch(request: request) { [weak self] result in
+            switch result {
+            case .success(let data):
+                print("Сырые данные ответа: \(String(data: data, encoding: .utf8) ?? "не удалось декодировать")")
+                do {
+                    let decoded = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
+                    self?.authToken = decoded.accessToken
+                    completion(.success(decoded.accessToken))
+                } catch {
+                    print("JSON decoding failed: \(error)")
+                    completion(.failure(AuthServiceError.networkError(error)))
                 }
-                self?.task = nil // 14
-                self?.lastCode = nil // 15
+            case .failure(let error):
+                print("Network error: \(error)")
+                completion(.failure(error))
             }
+            self?.task = nil
+            self?.lastCode = nil
         }
-        self.task = task // 16
-        task.resume() // 17
     }
     
     private func makeOAuthTokenRequest(code: String) -> URLRequest? {
-        guard var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token") else {
+        guard
+            var urlComponents = URLComponents(string: "https://unsplash.com/oauth/token")
+        else {
             assertionFailure("Failed to create URL")
             return nil
         }
