@@ -2,6 +2,12 @@ import Foundation
 
 final class ProfileService {
     
+    static let shared = ProfileService()
+    private init() {}
+    
+    private(set) var profile: Profile?
+    
+    private var task : URLSessionTask?
     struct ProfileResult: Codable {
         
         let username: String?
@@ -32,9 +38,33 @@ final class ProfileService {
         }
     }
     
-    func makeURLRequest(for username: String) -> URLRequest? {
+    func fetchProfile(completion: @escaping (Result<Profile, Error>) -> Void) {
+        assert(Thread.isMainThread)
+        task?.cancel()
         guard
-            let token = OAuth2TokenStorage.shared.token else {
+            let request = makeURLRequest() else {
+            print("❌ [ProfileService] Failed to create profile URL request")
+            return
+        }
+        
+        task = NetworkClient.shared.objectTask(for: request) { [weak self] (result: Result<ProfileResult, Error>) in
+            switch result {
+            case .success(let profileResult):
+                let profile = Profile(profileResult: profileResult)
+                self?.profile = profile
+                completion(.success(profile))
+                
+            case .failure(let error):
+                print("❌ [ProfileService] Failed to fetch profile: \(error)")
+                completion(.failure(error))
+            }
+            self?.task = nil
+        }
+    }
+    
+    private func makeURLRequest() -> URLRequest? {
+        
+        guard let token = OAuth2TokenStorage.shared.token else {
             return nil
         }
         

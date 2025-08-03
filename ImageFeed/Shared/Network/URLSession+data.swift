@@ -9,30 +9,27 @@ enum NetworkError: Error {
 }
 
 extension URLSession {
-    func data(
-        for request: URLRequest,
-        completion: @escaping (Result<Data, Error>) -> Void
-    )
-    -> URLSessionDataTask {
-        let fulfillCompletionOnTheMainThread: (Result<Data, Error>) -> Void = { result in
-            DispatchQueue.main.async {
-                completion(result)
+    func data(for request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionTask {
+        print("📤 [URLSession] Sending request to: \(request.url?.absoluteString ?? "no url")")
+
+        let task = dataTask(with: request) { data, response, error in
+            if let error = error {
+                print("❌ [URLSession] Request failed with error: \(error.localizedDescription)")
+                completion(.failure(error))
+                return
             }
+
+            guard let data = data else {
+                print("❌ [URLSession] No data in response.")
+                completion(.failure(NetworkError.invalidRequest))
+                return
+            }
+
+            print("✅ [URLSession] Received data: \(String(data: data, encoding: .utf8) ?? "unreadable")")
+            completion(.success(data))
         }
-        let task = dataTask(with: request, completionHandler: { data, response, error in
-            if let data, let response, let statusCode = (response as? HTTPURLResponse)?.statusCode {
-                if 200..<300 ~= statusCode {
-                    fulfillCompletionOnTheMainThread(.success(data))
-                } else {
-                    fulfillCompletionOnTheMainThread(.failure(NetworkError.httpStatusCode(statusCode)))
-                }
-            } else if let error {
-                fulfillCompletionOnTheMainThread(.failure(NetworkError.urlRequestError(error)))
-            } else {
-                fulfillCompletionOnTheMainThread(.failure(NetworkError.urlSessionError))
-            }
-            
-        })
+
+        task.resume()
         return task
     }
 }

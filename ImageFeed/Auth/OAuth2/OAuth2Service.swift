@@ -5,7 +5,6 @@ final class OAuth2Service {
     
     private let dataStorage = OAuth2TokenStorage.shared
     private let urlSession = URLSession.shared
-    
     private var task: URLSessionTask?
     
     private var lastCode: String?
@@ -31,34 +30,29 @@ final class OAuth2Service {
         task?.cancel()
         lastCode = code
 
-        print("Получен код: \(code)")
+        print("✅ [OAuth2Service] Received code: \(code)")
         guard
             let request = makeOAuthTokenRequest(code: code)
         else {
-            print("Request failed")
+            print("❌ [OAuth2Service] Failed to create request")
             completion(.failure(AuthServiceError.invalidRequest))
             return
         }
-        print("URL запроса токена: \(request.url?.absoluteString ?? "нет url")")
+        print("✅ [OAuth2Service] Token request URL: \(request.url?.absoluteString ?? "нет url")")
         if let body = request.httpBody {
-            print("Тело запроса: \(String(data: body, encoding: .utf8) ?? "не удалось декодировать")")
+            print("✅ [OAuth2Service] Request body: \(String(data: body, encoding: .utf8) ?? "не удалось декодировать")")
         }
 
-        task = NetworkClient.shared.fetch(request: request) { [weak self] result in
+        task = NetworkClient.shared.objectTask(for: request){ [weak self] (result: Result<OAuthTokenResponseBody, Error>) in
+            print("📤 [OAuth2Service] Started objectTask for token fetch")
             switch result {
-            case .success(let data):
-                print("Сырые данные ответа: \(String(data: data, encoding: .utf8) ?? "не удалось декодировать")")
-                do {
-                    let decoded = try JSONDecoder().decode(OAuthTokenResponseBody.self, from: data)
-                    self?.authToken = decoded.accessToken
-                    completion(.success(decoded.accessToken))
-                } catch {
-                    print("JSON decoding failed: \(error)")
-                    completion(.failure(AuthServiceError.networkError(error)))
-                }
+            case .success(let decoded):
+                self?.authToken = decoded.accessToken
+                print("💾 [OAuth2Service] Saved authToken: \(decoded.accessToken)")
+                completion(.success(decoded.accessToken))
             case .failure(let error):
-                print("Network error: \(error)")
-                completion(.failure(error))
+                print("❌ [OAuth2Service] Failed to fetch token: \(error)")
+                completion(.failure(AuthServiceError.networkError(error)))
             }
             self?.task = nil
             self?.lastCode = nil
@@ -81,8 +75,10 @@ final class OAuth2Service {
             URLQueryItem(name: "grant_type", value: "authorization_code")
         ]
 
+        print("🔧 [OAuth2Service] URLComponents: \(urlComponents)")
+
         guard let authTokenUrl = urlComponents.url else {
-            print("URL failed")
+            print("❌ [OAuth2Service] Failed to create token URL")
             return nil
         }
 
