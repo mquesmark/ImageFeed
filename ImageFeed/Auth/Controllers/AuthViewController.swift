@@ -11,7 +11,6 @@ final class AuthViewController: UIViewController {
     
     private let loginButton = UIButton()
     private let unsplashLogo = UIImageView()
-    private let showWebViewSegueIdentifier = "ShowWebView"
     
     private let oauth2Service = OAuth2Service.shared
     
@@ -21,7 +20,10 @@ final class AuthViewController: UIViewController {
         setConstraints()
         configureBackButton()
     }
-    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        view.endEditing(true)
+    }
     private func setupViewElements() {
         view.backgroundColor = .ypBlackIOS
         
@@ -38,7 +40,11 @@ final class AuthViewController: UIViewController {
         loginButton.clipsToBounds = true
         
         let action = UIAction { [weak self] _ in
-            self?.performSegue(withIdentifier: self?.showWebViewSegueIdentifier ?? "", sender: nil)
+            guard let self else {return}
+            let storyboard = UIStoryboard(name: "Main", bundle: .main)
+            let webVC = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
+            webVC.delegate = self
+            self.navigationController?.pushViewController(webVC, animated: true)
         }
         loginButton.addAction(action, for: .touchUpInside)
         
@@ -76,6 +82,7 @@ final class AuthViewController: UIViewController {
 
 extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
+        self.view.endEditing(true)
         navigationController?.popViewController(animated: true)
         UIBlockingProgressHUD.show("Обработка авторизации")
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
@@ -88,6 +95,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                     self.delegate?.didAuthenticate(self)
                 case .failure(let error):
                     print("Ошибка при получении токена: \(error)")
+                    self.showAuthErrorAlert()
                 }
             }
             UIBlockingProgressHUD.dismiss()
@@ -97,11 +105,13 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         dismiss(animated: true)
     }
-    
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showWebViewSegueIdentifier,
-           let webVC = segue.destination as? WebViewViewController {
-            webVC.delegate = self
-        }
+}
+
+extension AuthViewController {
+    func showAuthErrorAlert() {
+        let alertController = UIAlertController(title: "Что-то пошло не так", message: "Не удалось войти в систему", preferredStyle: .alert)
+        let action = UIAlertAction(title: "Ок", style: .default)
+        alertController.addAction(action)
+        present(alertController, animated: true)
     }
 }

@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 final class ProfileViewController: UIViewController {
     
@@ -20,14 +21,16 @@ final class ProfileViewController: UIViewController {
             forName: ProfileImageService.didChangeNotification,
             object: nil,
             queue: .main
-    ) { [weak self] _ in
-        guard let self else { return }
-        self.updateAvatar()
+        ) { [weak self] _ in
+            guard let self else { return }
+            self.updateAvatar()
         }
         updateAvatar()
     }
     
     private func setupViewElements() {
+        view.backgroundColor = .ypBlackIOS
+        
         userPicImageView.translatesAutoresizingMaskIntoConstraints = false
         userPicImageView.image = UIImage(named: "no_profile_pic")
         userPicImageView.clipsToBounds = true
@@ -47,13 +50,17 @@ final class ProfileViewController: UIViewController {
         profileDescriptionLabel.font = UIFont.systemFont(ofSize: 13)
         profileDescriptionLabel.textColor = UIColor(named: "YP White (iOS)")
         profileDescriptionLabel.translatesAutoresizingMaskIntoConstraints = false
+        profileDescriptionLabel.numberOfLines = 0
+        profileDescriptionLabel.lineBreakMode = .byWordWrapping
         
         exitButton.setImage(UIImage(named: "Exit"), for: .normal)
         exitButton.addAction(UIAction { _ in
             OAuth2TokenStorage.shared.clearTokenKey()
-            print("Sucсesfully logged out")
-            WebViewViewController.clearWebViewData {}
-            print("Exiting")
+            print("Successfully logged out")
+            WebViewViewController.clearWebViewData {
+                print("Exiting")
+                exit(0)
+            }
         }, for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.isHidden = true
@@ -108,8 +115,30 @@ final class ProfileViewController: UIViewController {
         guard
             let profileImageURL = ProfileImageService.shared.avatarURL,
             let url = URL(string: profileImageURL)
-                else { return }
-            // TODO: обновить аватар
+        else { return }
+        let placeholderImage = UIImage(named: "no_profile_pic")
+        let processor = RoundCornerImageProcessor(cornerRadius: 35)
+        userPicImageView.kf.indicatorType = .activity
+        userPicImageView.kf.setImage(
+            with: url,
+            placeholder: placeholderImage,
+            options: [
+                .processor(processor),
+                .scaleFactor(UIScreen.main.scale),
+                .cacheOriginalImage,
+                .forceRefresh
+            ]
+        ) {
+            result in
+            switch result {
+            case .success(let value):
+                print(value.image)
+                print(value.cacheType)
+                print(value.source)
+            case .failure(let error):
+                print(error)
+            }
+        }
     }
     
 }

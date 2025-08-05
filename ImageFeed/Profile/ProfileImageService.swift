@@ -18,7 +18,7 @@ final class ProfileImageService {
             case profileImage = "profile_image"
         }
         struct ProfileImage: Codable {
-            let small: String
+            let large: String // сделал не small, а large, потому что выглядит невероятно мыльно (что в том числе не соответствует макету, где фото качественно видно  в профиле)
         }
     }
     
@@ -34,7 +34,7 @@ final class ProfileImageService {
             [weak self] (result: Result<UserResult, Error>) in
             switch result {
                 case .success(let userResult):
-                let imageURL = userResult.profileImage.small
+                let imageURL = userResult.profileImage.large
                 self?.avatarURL = imageURL
                 NotificationCenter.default.post(name: ProfileImageService.didChangeNotification, object: self,
                                                 userInfo: ["URL": imageURL])

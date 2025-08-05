@@ -4,8 +4,11 @@ final class SplashViewController: UIViewController {
     private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
     private let storage = OAuth2TokenStorage.shared
     
+    private let imageView = UIImageView()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupViewElementsAndConstraints()
     }
     
     override func viewDidAppear(_ animated: Bool) {
@@ -14,10 +17,26 @@ final class SplashViewController: UIViewController {
         if let token = storage.token {
             fetchProfile(token: token)
         } else {
-            performSegue(withIdentifier: showAuthenticationScreenSegueIdentifier, sender: nil)
+            let authVC = AuthViewController()
+            authVC.delegate = self
+
+            let navVC = UINavigationController(rootViewController: authVC)
+            navVC.modalPresentationStyle = .fullScreen
+            present(navVC, animated: true)
         }
     }
     
+    // MARK: Private methods
+    
+    private func setupViewElementsAndConstraints() {
+        view.backgroundColor = .ypBlackIOS
+        view.addSubview(imageView)
+        
+        imageView.image = UIImage(named: "splash_screen_logo")
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
+        imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+    }
     private func switchToTabBarController() {
         DispatchQueue.main.async{
             guard let window = UIApplication.shared.windows.first else {
@@ -32,26 +51,12 @@ final class SplashViewController: UIViewController {
 }
 
 extension SplashViewController: AuthViewControllerDelegate {
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        if segue.identifier == showAuthenticationScreenSegueIdentifier {
-            guard let navigationController = segue.destination as? UINavigationController,
-                  let viewController = navigationController.viewControllers.first as? AuthViewController
-            else {
-                assertionFailure("Failed to prepare for \(showAuthenticationScreenSegueIdentifier)")
-                return
-            }
-            viewController.delegate = self
-        } else {
-            super.prepare(for: segue, sender: sender)
-        }
-    }
-    
+
     func didAuthenticate(_ vc: AuthViewController) {
         DispatchQueue.main.async {
             vc.dismiss(animated: true) }
         if let token = storage.token {
             fetchProfile(token: token)
-           // switchToTabBarController()
         }
     }
 }
