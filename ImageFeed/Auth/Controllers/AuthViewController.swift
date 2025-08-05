@@ -49,8 +49,8 @@ final class AuthViewController: UIViewController {
         loginButton.addAction(action, for: .touchUpInside)
         
 
-        ProgressHUD.animationType = .sfSymbolBounce
-        ProgressHUD.animationSymbol = "key.icloud"
+       // ProgressHUD.animationType = .sfSymbolBounce
+     //   ProgressHUD.animationSymbol = "key.icloud"
         ProgressHUD.colorAnimation = .ypBlackIOS
     }
     
@@ -84,7 +84,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         self.view.endEditing(true)
         navigationController?.popViewController(animated: true)
-        UIBlockingProgressHUD.show("Обработка авторизации")
+        UIBlockingProgressHUD.show()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else { return }
 
@@ -103,6 +103,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     }
     
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
+        view.endEditing(true)
         dismiss(animated: true)
     }
 }

@@ -65,8 +65,8 @@ extension SplashViewController: AuthViewControllerDelegate {
 extension SplashViewController {
     private func fetchProfile(token: String) {
         UIBlockingProgressHUD.changeColor(to: .ypBlackIOS)
-        UIBlockingProgressHUD.changeAnimationStyle(to: .sfSymbolBounce, symbol: "network")
-        UIBlockingProgressHUD.show("Загрузка профиля")
+     //   UIBlockingProgressHUD.changeAnimationStyle(to: .sfSymbolBounce, symbol: "network")
+        UIBlockingProgressHUD.show()
         DispatchQueue.main.async {
         ProfileService.shared.fetchProfile() { [weak self] result in
             guard let self else { return }
