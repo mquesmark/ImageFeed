@@ -1,7 +1,6 @@
 import UIKit
 
 final class SplashViewController: UIViewController {
-    private let showAuthenticationScreenSegueIdentifier = "showAuthenticationScreen"
     private let storage = OAuth2TokenStorage.shared
     
     private let imageView = UIImageView()

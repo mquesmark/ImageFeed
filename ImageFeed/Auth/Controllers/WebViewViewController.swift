@@ -1,20 +1,17 @@
 import WebKit
 import UIKit
 
-enum WebViewConstants {
-    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
-}
-
 final class WebViewViewController: UIViewController {
     
     var delegate: WebViewViewControllerDelegate?
     private var estimatedProgressObservation: NSKeyValueObservation?
     
-    @IBOutlet private var webView: WKWebView!
-    @IBOutlet private var progressView: UIProgressView!
+    let webView = WKWebView()
+    let progressView = UIProgressView()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        setupUIElements()
         loadAuthView()
         webView.navigationDelegate = self
         
@@ -27,7 +24,27 @@ final class WebViewViewController: UIViewController {
              }
         )
     }
-    
+    private func setupUIElements() {
+        view.addSubview(webView)
+        view.addSubview(progressView)
+        
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        progressView.translatesAutoresizingMaskIntoConstraints = false
+        
+        progressView.progressTintColor = .ypBlackIOS
+        
+        NSLayoutConstraint.activate([
+        webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        webView.topAnchor.constraint(equalTo: view.topAnchor),
+        webView.bottomAnchor.constraint(equalTo: progressView.topAnchor),
+        
+        progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+        progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
+        progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+       
+    }
     private func loadAuthView() {
         guard var urlComponents = URLComponents(string: WebViewConstants.unsplashAuthorizeURLString) else {
             print("Failed to create URLComponents")
@@ -102,4 +119,8 @@ extension WebViewViewController: WKNavigationDelegate {
         let since = Date(timeIntervalSince1970: 0)
         WKWebsiteDataStore.default().removeData(ofTypes: types, modifiedSince: since, completionHandler: completion)
     }
+}
+
+enum WebViewConstants {
+    static let unsplashAuthorizeURLString = "https://unsplash.com/oauth/authorize"
 }

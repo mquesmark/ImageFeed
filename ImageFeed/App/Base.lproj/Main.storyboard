@@ -220,48 +220,6 @@
             </objects>
             <point key="canvasLocation" x="-202" y="-1499"/>
         </scene>
-        <!--Web View View Controller-->
-        <scene sceneID="ikG-Jc-7on">
-            <objects>
-                <viewController storyboardIdentifier="WebViewViewController" id="Xml-wG-zwF" customClass="WebViewViewController" customModule="ImageFeed" customModuleProvider="target" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="fQX-TH-4GE">
-                        <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <wkWebView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="7LN-H1-64T">
-                                <rect key="frame" x="0.0" y="118" width="393" height="734"/>
-                                <color key="backgroundColor" name="YP White (iOS)"/>
-                                <wkWebViewConfiguration key="configuration">
-                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
-                                    <wkPreferences key="preferences"/>
-                                </wkWebViewConfiguration>
-                            </wkWebView>
-                            <progressView opaque="NO" contentMode="scaleToFill" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="HCm-85-Rfn">
-                                <rect key="frame" x="0.0" y="118" width="393" height="4"/>
-                            </progressView>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="yUh-xX-ypD"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                        <constraints>
-                            <constraint firstAttribute="trailing" secondItem="7LN-H1-64T" secondAttribute="trailing" id="0hQ-gf-uzJ"/>
-                            <constraint firstItem="HCm-85-Rfn" firstAttribute="top" secondItem="yUh-xX-ypD" secondAttribute="top" id="A49-jd-xGm"/>
-                            <constraint firstAttribute="bottom" secondItem="7LN-H1-64T" secondAttribute="bottom" id="Pbe-aL-QRO"/>
-                            <constraint firstItem="yUh-xX-ypD" firstAttribute="trailing" secondItem="HCm-85-Rfn" secondAttribute="trailing" id="QtI-4M-uY4"/>
-                            <constraint firstAttribute="leading" secondItem="7LN-H1-64T" secondAttribute="leading" id="iCE-a5-eNE"/>
-                            <constraint firstItem="HCm-85-Rfn" firstAttribute="leading" secondItem="yUh-xX-ypD" secondAttribute="leading" id="lIL-lP-CS1"/>
-                            <constraint firstItem="7LN-H1-64T" firstAttribute="top" secondItem="yUh-xX-ypD" secondAttribute="top" id="zEL-hT-E0L"/>
-                        </constraints>
-                    </view>
-                    <navigationItem key="navigationItem" id="5IR-n0-NGq"/>
-                    <connections>
-                        <outlet property="progressView" destination="HCm-85-Rfn" id="b2E-NE-tUg"/>
-                        <outlet property="webView" destination="7LN-H1-64T" id="K7x-L3-V48"/>
-                    </connections>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="iSe-X2-uAh" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="1027" y="-1499"/>
-        </scene>
     </scenes>
     <resources>
         <image name="0" width="1600" height="1059"/>
