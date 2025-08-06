@@ -11,7 +11,7 @@ final class OAuth2Service {
     
     private(set) var authToken: String? {
         get {
-            return dataStorage.token
+            dataStorage.token
         }
         set {
             dataStorage.token = newValue
@@ -83,7 +83,7 @@ final class OAuth2Service {
         }
 
         var request = URLRequest(url: authTokenUrl)
-        request.httpMethod = "POST"
+        request.httpMethod = HTTPMethod.post.rawValue
         return request
     }
 }
@@ -99,4 +99,11 @@ private struct OAuthTokenResponseBody: Decodable {
 enum AuthServiceError: Error {
     case invalidRequest
     case networkError(Error)
+}
+
+enum HTTPMethod: String {
+    case get = "GET"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
 }

@@ -16,10 +16,10 @@ final class ProfileService {
         let bio: String?
         
         enum CodingKeys: String, CodingKey {
-            case username = "username"
             case firstName = "first_name"
             case lastName = "last_name"
-            case bio = "bio"
+            case username
+            case bio
         }
         
     }
@@ -64,13 +64,14 @@ final class ProfileService {
     
     private func makeURLRequest() -> URLRequest? {
         
-        guard let token = OAuth2TokenStorage.shared.token else {
+        guard
+            let token = OAuth2TokenStorage.shared.token,
+            let url = URL(string: "https://api.unsplash.com/me")
+        else {
+            print("❌ [ProfileService] Error in creating URLRequest")
             return nil
         }
         
-        guard let url = URL(string: "https://api.unsplash.com/me") else {
-            return nil
-        }
         
         var request = URLRequest (url: url)
         request.httpMethod = "GET"

@@ -32,7 +32,7 @@ final class SplashViewController: UIViewController {
         view.backgroundColor = .ypBlackIOS
         view.addSubview(imageView)
         
-        imageView.image = UIImage(named: "splash_screen_logo")
+        imageView.image = UIImage(resource: .splashScreenLogo)
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.centerYAnchor.constraint(equalTo: view.centerYAnchor).isActive = true
         imageView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
@@ -64,12 +64,13 @@ extension SplashViewController: AuthViewControllerDelegate {
 
 extension SplashViewController {
     private func fetchProfile(token: String) {
-        UIBlockingProgressHUD.changeColor(to: .ypBlackIOS)
-     //   UIBlockingProgressHUD.changeAnimationStyle(to: .sfSymbolBounce, symbol: "network")
         UIBlockingProgressHUD.show()
         DispatchQueue.main.async {
         ProfileService.shared.fetchProfile() { [weak self] result in
-            guard let self else { return }
+            guard let self else {
+                UIBlockingProgressHUD.dismiss()
+                return
+            }
             
             switch result {
             case .success(let profile):

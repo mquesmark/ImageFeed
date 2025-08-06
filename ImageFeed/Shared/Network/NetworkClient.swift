@@ -2,6 +2,10 @@ import Foundation
 
 final class NetworkClient {
     static let shared = NetworkClient()
+    private init(){}
+    
+    private let decoder = JSONDecoder()
+
     
     func fetch(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionTask {
         let task = URLSession.shared.data(for: request, completion: completion)
@@ -9,18 +13,16 @@ final class NetworkClient {
         return task
     }
     
-    
     func objectTask<T: Decodable>(
         for request: URLRequest,
         completion: @escaping (Result<T, Error>) -> Void
     ) -> URLSessionTask {
         print("📡 [NetworkClient] Starting objectTask with request: \(request.url?.absoluteString ?? "nil URL")")
-        let decoder = JSONDecoder()
         let task = URLSession.shared.data(for: request) { (result: Result<Data, Error>) in
             switch result {
             case .success(let data):
                 do {
-                    let decoded = try decoder.decode(T.self, from: data)
+                    let decoded = try self.decoder.decode(T.self, from: data)
                     print("✅ [NetworkClient] Decoded object: \(decoded)")
                     completion(.success(decoded))
                 } catch {

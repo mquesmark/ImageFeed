@@ -7,9 +7,9 @@ final class UIBlockingProgressHUD {
         return UIApplication.shared.windows.first
     }
     static func show(_ text: String? = nil) {
-        
         DispatchQueue.main.async {
             window?.isUserInteractionEnabled = false
+            ProgressHUD.colorAnimation = .ypBlackIOS
             ProgressHUD.animate(text)
         }
     }

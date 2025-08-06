@@ -47,11 +47,6 @@ final class AuthViewController: UIViewController {
             self.navigationController?.pushViewController(webVC, animated: true)
         }
         loginButton.addAction(action, for: .touchUpInside)
-        
-
-       // ProgressHUD.animationType = .sfSymbolBounce
-     //   ProgressHUD.animationSymbol = "key.icloud"
-        ProgressHUD.colorAnimation = .ypBlackIOS
     }
     
     private func setConstraints() {
@@ -86,19 +81,23 @@ extension AuthViewController: WebViewViewControllerDelegate {
         navigationController?.popViewController(animated: true)
         UIBlockingProgressHUD.show()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
-            guard let self else { return }
+            guard let self else {
+                UIBlockingProgressHUD.dismiss()
+                return
+            }
 
             self.oauth2Service.fetchOAuthToken(code: code) { result in
                 switch result {
                 case .success(let token):
                     print("Токен успешно получен: \(token)")
                     self.delegate?.didAuthenticate(self)
+                    UIBlockingProgressHUD.dismiss()
                 case .failure(let error):
                     print("Ошибка при получении токена: \(error)")
                     self.showAuthErrorAlert()
+                    UIBlockingProgressHUD.dismiss()
                 }
             }
-            UIBlockingProgressHUD.dismiss()
         }
     }
     
