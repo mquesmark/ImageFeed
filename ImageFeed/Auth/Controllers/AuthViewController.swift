@@ -7,10 +7,6 @@ protocol AuthViewControllerDelegate: AnyObject {
 
 final class AuthViewController: UIViewController {
     
-    override var preferredStatusBarStyle: UIStatusBarStyle {
-        return .lightContent
-    }
-    
     weak var delegate: AuthViewControllerDelegate?
     
     private let loginButton = UIButton()
@@ -27,13 +23,11 @@ final class AuthViewController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         view.endEditing(true)
-        setNeedsStatusBarAppearanceUpdate()
     }
 
 
     private func setupViewElements() {
         view.backgroundColor = .ypBlackIOS
-        
         view.addSubview(unsplashLogo)
         view.addSubview(loginButton)
 

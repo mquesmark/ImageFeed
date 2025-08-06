@@ -21,7 +21,6 @@ final class SplashViewController: UIViewController {
 
             let navVC = UINavigationController(rootViewController: authVC)
             navVC.modalPresentationStyle = .fullScreen
-            navVC.modalPresentationCapturesStatusBarAppearance = true
             present(navVC, animated: true)
         }
     }
