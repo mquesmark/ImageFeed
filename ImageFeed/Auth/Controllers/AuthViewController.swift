@@ -40,9 +40,12 @@ final class AuthViewController: UIViewController {
         loginButton.clipsToBounds = true
         
         let action = UIAction { [weak self] _ in
-            guard let self else {return}
+            guard let self else { return }
             let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let webVC = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
+            guard let webVC = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as? WebViewViewController else {
+                assertionFailure("Не удалось создать WebViewViewController из storyboard")
+                return
+            }
             webVC.delegate = self
             self.navigationController?.pushViewController(webVC, animated: true)
         }
