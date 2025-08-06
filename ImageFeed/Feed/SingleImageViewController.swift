@@ -2,10 +2,11 @@ import UIKit
 
 final class SingleImageViewController: UIViewController {
     
-    // MARK: - Outlets
-    
-    @IBOutlet private weak var imageView: UIImageView!
-    @IBOutlet private weak var scrollView: UIScrollView!
+    // MARK: - Private Properties
+    private var imageView = UIImageView()
+    private var scrollView = UIScrollView()
+    private var backButton = UIButton(type: .custom)
+    private var shareButton = UIButton(type: .custom)
     
     // MARK: - Public Properties
     
@@ -14,7 +15,7 @@ final class SingleImageViewController: UIViewController {
             guard isViewLoaded, let image else { return }
             imageView.image = image
             imageView.frame.size = image.size
-                rescaleAndCenter(image: image)
+            rescaleAndCenter(image: image)
         }
     }
     
@@ -22,26 +23,71 @@ final class SingleImageViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        scrollView.minimumZoomScale = 0.1
-        scrollView.maximumZoomScale = 1.25
+        setupViews()
+        setupActions()
+        setupConstraints()
         
         guard let image else { return }
-            imageView.image = image
-            imageView.frame.size = image.size
-            rescaleAndCenter(image: image)
-        
-        let swipeBackGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeBack))
-        swipeBackGesture.direction = .down
-        view.addGestureRecognizer(swipeBackGesture)
+        imageView.image = image
+        imageView.frame.size = image.size
+        rescaleAndCenter(image: image)
+    }
+
+    private func setupViews() {
+        view.backgroundColor = .ypBlackIOS
+        backButton.translatesAutoresizingMaskIntoConstraints = false
+        shareButton.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+
+        view.addSubview(scrollView)
+        view.addSubview(backButton)
+        view.addSubview(shareButton)
+        scrollView.addSubview(imageView)
+    }
+
+    private func setupActions() {
+
+        backButton.setImage(UIImage(resource: .backward), for: .normal)
+        let backAction = UIAction { [weak self] _ in
+            self?.dismiss(animated: true)
+        }
+        backButton.addAction(backAction, for: .touchUpInside)
+
+        shareButton.setImage(UIImage(resource: .sharing), for: .normal)
+        let shareAction = UIAction { [weak self] _ in
+            self?.didTapShareButton()
+        }
+        shareButton.addAction(shareAction, for: .touchUpInside)
+
+        scrollView.delegate = self
+        scrollView.minimumZoomScale = 0.1
+        scrollView.maximumZoomScale = 1.25
+
+        let swipeDownGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeBack))
+        swipeDownGesture.direction = .down
+        view.addGestureRecognizer(swipeDownGesture)
     }
     
-    // MARK: - Actions
-    
-    @IBAction private func didTapBackButton(_ sender: UIButton) {
-        dismiss(animated: true)
-        print("Dismissed SingleImageViewController via back button")
+    private func setupConstraints() {
+        NSLayoutConstraint.activate([
+            backButton.widthAnchor.constraint(equalToConstant: 48),
+            backButton.heightAnchor.constraint(equalToConstant: 48),
+            backButton.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor, constant: 8),
+            backButton.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor, constant: 8),
+            
+            shareButton.widthAnchor.constraint(equalToConstant: 50),
+            shareButton.heightAnchor.constraint(equalToConstant: 50),
+            shareButton.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            shareButton.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor, constant: -17),
+            
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.topAnchor.constraint(equalTo: view.topAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+        ])
     }
-    @IBAction private func didTapShareButton(_ sender: UIButton) {
+    
+    private func didTapShareButton() {
         guard let image else { return }
         
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
@@ -50,7 +96,6 @@ final class SingleImageViewController: UIViewController {
     
     @objc private func handleSwipeBack() {
         dismiss(animated: true)
-        print("Dismissed SingleImageViewController via swipe")
     }
 }
 

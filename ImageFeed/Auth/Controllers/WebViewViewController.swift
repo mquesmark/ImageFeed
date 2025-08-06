@@ -6,6 +6,9 @@ final class WebViewViewController: UIViewController {
     var delegate: WebViewViewControllerDelegate?
     private var estimatedProgressObservation: NSKeyValueObservation?
     
+    override var preferredStatusBarStyle: UIStatusBarStyle {
+        return .darkContent
+    }
     let webView = WKWebView()
     let progressView = UIProgressView()
     
@@ -14,7 +17,6 @@ final class WebViewViewController: UIViewController {
         setupUIElements()
         loadAuthView()
         webView.navigationDelegate = self
-        
         estimatedProgressObservation = webView.observe(
             \.estimatedProgress,
              options: [],
@@ -23,6 +25,11 @@ final class WebViewViewController: UIViewController {
                  self.updateProgress()
              }
         )
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        setNeedsStatusBarAppearanceUpdate()
     }
     private func setupUIElements() {
         view.backgroundColor = .ypWhiteIOS
