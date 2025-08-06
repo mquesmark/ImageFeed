@@ -39,6 +39,7 @@ final class SingleImageViewController: UIViewController {
     
     @IBAction private func didTapBackButton(_ sender: UIButton) {
         dismiss(animated: true)
+        print("Dismissed SingleImageViewController via back button")
     }
     @IBAction private func didTapShareButton(_ sender: UIButton) {
         guard let image else { return }
@@ -49,6 +50,7 @@ final class SingleImageViewController: UIViewController {
     
     @objc private func handleSwipeBack() {
         dismiss(animated: true)
+        print("Dismissed SingleImageViewController via swipe")
     }
 }
 

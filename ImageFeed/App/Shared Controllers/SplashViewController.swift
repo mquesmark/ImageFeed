@@ -53,7 +53,9 @@ extension SplashViewController: AuthViewControllerDelegate {
 
     func didAuthenticate(_ vc: AuthViewController) {
         DispatchQueue.main.async {
-            vc.dismiss(animated: true) }
+            vc.dismiss(animated: true)
+            print("Dismissed: AuthViewController")
+        }
         if let token = storage.token {
             fetchProfile(token: token)
         }

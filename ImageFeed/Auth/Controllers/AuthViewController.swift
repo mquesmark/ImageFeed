@@ -40,11 +40,10 @@ final class AuthViewController: UIViewController {
         loginButton.clipsToBounds = true
         
         let action = UIAction { [weak self] _ in
-            guard let self else {return}
-            let storyboard = UIStoryboard(name: "Main", bundle: .main)
-            let webVC = storyboard.instantiateViewController(withIdentifier: "WebViewViewController") as! WebViewViewController
+            guard let self else { return }
+        let webVC = WebViewViewController()
             webVC.delegate = self
-            self.navigationController?.pushViewController(webVC, animated: true)
+            navigationController?.pushViewController(webVC, animated: true)
         }
         loginButton.addAction(action, for: .touchUpInside)
     }
@@ -79,6 +78,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewController(_ vc: WebViewViewController, didAuthenticateWithCode code: String) {
         self.view.endEditing(true)
         navigationController?.popViewController(animated: true)
+        print("Popped web view controller")
         UIBlockingProgressHUD.show()
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) { [weak self] in
             guard let self else {
@@ -104,6 +104,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
     func webViewViewControllerDidCancel(_ vc: WebViewViewController) {
         view.endEditing(true)
         dismiss(animated: true)
+        print("WebViewController dismissed")
     }
 }
 

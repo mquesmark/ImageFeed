@@ -25,23 +25,24 @@ final class WebViewViewController: UIViewController {
         )
     }
     private func setupUIElements() {
-        view.addSubview(webView)
-        view.addSubview(progressView)
-        
+        view.backgroundColor = .ypWhiteIOS
         webView.translatesAutoresizingMaskIntoConstraints = false
         progressView.translatesAutoresizingMaskIntoConstraints = false
-        
+
+        view.addSubview(webView)
+        view.addSubview(progressView)
+        progressView.isHidden = true
         progressView.progressTintColor = .ypBlackIOS
         
         NSLayoutConstraint.activate([
         webView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
         webView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        webView.topAnchor.constraint(equalTo: view.topAnchor),
-        webView.bottomAnchor.constraint(equalTo: progressView.topAnchor),
+        webView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+        webView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         
         progressView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
         progressView.trailingAnchor.constraint(equalTo: view.trailingAnchor),
-        progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        progressView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor)
         ])
        
     }
