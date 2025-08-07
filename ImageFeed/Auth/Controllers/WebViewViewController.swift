@@ -8,6 +8,7 @@ enum WebViewConstants {
 final class WebViewViewController: UIViewController {
     
     var delegate: WebViewViewControllerDelegate?
+    private var estimatedProgressObservation: NSKeyValueObservation?
     
     @IBOutlet private var webView: WKWebView!
     @IBOutlet private var progressView: UIProgressView!
@@ -16,6 +17,15 @@ final class WebViewViewController: UIViewController {
         super.viewDidLoad()
         loadAuthView()
         webView.navigationDelegate = self
+        
+        estimatedProgressObservation = webView.observe(
+            \.estimatedProgress,
+             options: [],
+             changeHandler: { [weak self] webView, _ in
+                 guard let self else { return }
+                 self.updateProgress()
+             }
+        )
     }
     
     private func loadAuthView() {
@@ -40,24 +50,11 @@ final class WebViewViewController: UIViewController {
         webView.load(request)
     }
     
-    override func observeValue(
-        forKeyPath keyPath: String?,
-        of object: Any?,
-        change: [NSKeyValueChangeKey : Any]?,
-        context: UnsafeMutableRawPointer?
-    ) {
-        if keyPath == #keyPath(WKWebView.estimatedProgress) {
-            updateProgress()
-        } else {
-            super.observeValue(forKeyPath: keyPath, of: object, change: change, context: context)
-        }
-    }
-    
     private func updateProgress() {
         progressView.setProgress(Float(webView.estimatedProgress), animated: true)
         if fabs(webView.estimatedProgress - 1.0) <= 0.0001 {
             DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                UIView.animate(withDuration: 0.3, animations: {
+                UIView.animate(withDuration: 0.25, animations: {
                     self.progressView.alpha = 0.0
                 }) { _ in
                     self.progressView.setProgress(0.0, animated: false)
@@ -66,16 +63,9 @@ final class WebViewViewController: UIViewController {
             }
         } else {
             progressView.isHidden = false
+            progressView.progressTintColor = .ypBlackIOS
             progressView.alpha = 1.0
         }
-    }
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        webView.addObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
-    }
-    override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        webView.removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress), context: nil)
     }
 }
 
