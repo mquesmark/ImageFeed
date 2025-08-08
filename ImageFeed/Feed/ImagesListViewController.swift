@@ -1,10 +1,10 @@
 import UIKit
 
 final class ImagesListViewController: UIViewController {
-    // MARK: - Outlets
-    @IBOutlet private var tableView: UITableView!
     
     // MARK: - Private Properties
+    private var tableView = UITableView()
+
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -17,13 +17,31 @@ final class ImagesListViewController: UIViewController {
     // MARK: - Lifecycle
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
-        
-        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
-        
+        setupTableView()
     }
     
     // MARK: - Private Methods
+    
+    private func setupTableView() {
+        tableView.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(tableView)
+        
+        NSLayoutConstraint.activate([
+            tableView.topAnchor.constraint(equalTo: view.topAnchor),
+            tableView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
+            tableView.leadingAnchor.constraint(equalTo: view.leadingAnchor),
+            tableView.trailingAnchor.constraint(equalTo: view.trailingAnchor)
+        ])
+        tableView.register(ImagesListCell.self, forCellReuseIdentifier: ImagesListCell.reuseIdentifier)
+        tableView.dataSource = self
+        tableView.delegate = self
+        tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
+        tableView.backgroundColor = .ypBlackIOS
+        tableView.separatorStyle = .none
+        tableView.showsVerticalScrollIndicator = false
+
+    }
+    
     private func configCell(for cell: ImagesListCell, with indexPath: IndexPath) {
         let imageName = String(indexPath.row)
         guard let image = UIImage(named: imageName) else { return }

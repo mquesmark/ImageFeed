@@ -16,30 +16,11 @@
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="none" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="9sk-nr-yQX">
-                                <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
-                                <color key="backgroundColor" name="YP Black (iOS)"/>
-                                <connections>
-                                    <outlet property="dataSource" destination="BYZ-38-t0r" id="GFd-rE-vXg"/>
-                                    <outlet property="delegate" destination="BYZ-38-t0r" id="KSe-Ta-aZK"/>
-                                </connections>
-                            </tableView>
-                        </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" name="YP Black (iOS)"/>
-                        <constraints>
-                            <constraint firstItem="9sk-nr-yQX" firstAttribute="bottom" secondItem="8bC-Xf-vdC" secondAttribute="bottom" id="MUR-wO-IyG"/>
-                            <constraint firstAttribute="top" secondItem="9sk-nr-yQX" secondAttribute="top" id="OdO-iH-YFe"/>
-                            <constraint firstItem="9sk-nr-yQX" firstAttribute="leading" secondItem="8bC-Xf-vdC" secondAttribute="leading" id="Uqp-yr-64a"/>
-                            <constraint firstAttribute="trailing" secondItem="9sk-nr-yQX" secondAttribute="trailing" id="wr5-v8-IR8"/>
-                        </constraints>
                     </view>
                     <tabBarItem key="tabBarItem" title="" image="tab_editorial_active" id="LbM-df-1fZ"/>
                     <navigationItem key="navigationItem" id="DmT-NT-kBe"/>
-                    <connections>
-                        <outlet property="tableView" destination="9sk-nr-yQX" id="ykU-eD-Vau"/>
-                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
