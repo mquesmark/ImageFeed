@@ -71,10 +71,10 @@ final class ImagesListCell: UITableViewCell {
     private func makeBottomOverlayGradient() -> CAGradientLayer {
         let gradient = CAGradientLayer()
         gradient.colors = [
-            UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 0).cgColor,
-            UIColor(red: 0.102, green: 0.106, blue: 0.133, alpha: 1).cgColor
+            UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 0).cgColor,
+            UIColor(red: 26/255, green: 27/255, blue: 34/255, alpha: 0.2).cgColor
         ]
-        gradient.locations = [0.0, 1.0]
+        gradient.locations = [0.0, 0.5393] // 53.93%
         gradient.startPoint = CGPoint(x: 0.5, y: 0.0)
         gradient.endPoint = CGPoint(x: 0.5, y: 1.0)
         gradient.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 32, height: 30)
