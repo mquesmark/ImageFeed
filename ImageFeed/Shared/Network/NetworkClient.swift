@@ -2,10 +2,11 @@ import Foundation
 
 final class NetworkClient {
     static let shared = NetworkClient()
-    private init(){}
+    private init(){
+        decoder.dateDecodingStrategy = .iso8601
+    }
     
     private let decoder = JSONDecoder()
-
     
     func fetch(request: URLRequest, completion: @escaping (Result<Data, Error>) -> Void) -> URLSessionTask {
         let task = URLSession.shared.data(for: request, completion: completion)
@@ -38,3 +39,5 @@ final class NetworkClient {
         return task
     }
 }
+
+

@@ -3,6 +3,8 @@ import UIKit
 
 final class ImagesListCell: UITableViewCell {
     
+    var onLikeTap: (() -> Void)?
+    
     let cellImage = UIImageView()
     let cellLike = UIButton()
     let cellDate = UILabel()
@@ -14,6 +16,10 @@ final class ImagesListCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
         setupConstraintsAndVisuals()
+        
+        cellLike.addAction(UIAction { [weak self] _ in
+            self?.onLikeTap?()
+        }, for: .touchUpInside)
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -21,7 +27,9 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        cellImage.kf.cancelDownloadTask()
         cellImage.image = nil
+        cellImage.contentMode = .center
     }
     
     private func setupViews() {
@@ -80,4 +88,5 @@ final class ImagesListCell: UITableViewCell {
         gradient.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 32, height: 30)
         return gradient
     }
+    
 }
