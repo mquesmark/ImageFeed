@@ -62,6 +62,9 @@ final class ProfileService {
         }
     }
     
+    func clearCachedProfile() {
+        profile = nil
+    }
     private func makeURLRequest() -> URLRequest? {
         
         guard

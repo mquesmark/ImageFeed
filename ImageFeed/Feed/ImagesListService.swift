@@ -2,7 +2,6 @@ import UIKit
 
 final class ImagesListService {
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
-    static let didChangeLikeNotification = Notification.Name("ImagesListServiceDidChangeLike")
     static let shared = ImagesListService()
     private init() {}
     
@@ -55,6 +54,10 @@ final class ImagesListService {
             self?.task = nil
         }
     }
+    func clearFeed() {
+        photos = []
+        lastLoadedPage = 0
+    }
     func changeLike(photoId: String, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
         guard likeTask == nil,
             let request = makeURLRequest(forId: photoId, isLiked: isLiked) else {
@@ -65,10 +68,10 @@ final class ImagesListService {
         
        likeTask = NetworkClient.shared.objectTask(for: request) { [weak self] (result: Result<LikeResponse, Error>) in
             switch result {
-            case .success(let likeResponse):
-                if let index = self?.photos.firstIndex(where: {$0.id == photoId}) {
-                    self?.photos[index].isLiked = likeResponse.photo.likedByUser
-                    NotificationCenter.default.post(name: ImagesListService.didChangeLikeNotification, object: self, userInfo: ["photoId": photoId])
+            case .success(let response):
+                guard let self else { return }
+                if let index = self.photos.firstIndex(where: { $0.id == response.photo.id }) {
+                    self.photos[index].isLiked = response.photo.likedByUser
                 }
                 completion(.success(()))
             case .failure(let error):

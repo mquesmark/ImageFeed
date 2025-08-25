@@ -55,12 +55,7 @@ final class ProfileViewController: UIViewController {
         
         exitButton.setImage(UIImage(named: "Exit"), for: .normal)
         exitButton.addAction(UIAction { _ in
-            OAuth2TokenStorage.shared.clearTokenKey()
-            print("Successfully logged out")
-            WebViewViewController.clearWebViewData {
-                print("Exiting")
-                exit(0)
-            }
+            ProfileLogoutService.shared.logout()
         }, for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.isHidden = true

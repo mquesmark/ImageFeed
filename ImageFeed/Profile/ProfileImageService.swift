@@ -21,6 +21,9 @@ final class ProfileImageService {
             let large: String // сделал не small, а large, потому что выглядит невероятно мыльно (что в том числе не соответствует макету, где фото качественно видно  в профиле)
         }
     }
+    func clearImageURL() {
+        avatarURL = nil
+    }
     
     func fetchProfileImage(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         task?.cancel()

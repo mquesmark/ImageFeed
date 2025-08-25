@@ -3,12 +3,11 @@ import UIKit
 
 final class ImagesListCell: UITableViewCell {
     
-    var onLikeTap: (() -> Void)?
-    
     let cellImage = UIImageView()
     let cellLike = UIButton()
     let cellDate = UILabel()
     let gradientOverlay = UIView()
+    weak var delegate: ImagesListCellDelegate?
     
     static let reuseIdentifier = "ImagesListCell"
     
@@ -18,7 +17,10 @@ final class ImagesListCell: UITableViewCell {
         setupConstraintsAndVisuals()
         
         cellLike.addAction(UIAction { [weak self] _ in
-            self?.onLikeTap?()
+            guard let self else {
+                return
+            }
+            likeButtonClicked()
         }, for: .touchUpInside)
     }
     required init?(coder: NSCoder) {
@@ -30,6 +32,14 @@ final class ImagesListCell: UITableViewCell {
         cellImage.kf.cancelDownloadTask()
         cellImage.image = nil
         cellImage.contentMode = .center
+    }
+
+    private func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        cellLike.setImage(isLiked ? UIImage(resource: .activeLike) : UIImage(resource: .inactiveLike), for: .normal)
     }
     
     private func setupViews() {

@@ -7,7 +7,7 @@ final class ImagesListViewController: UIViewController {
     
     // MARK: - Private Properties
     private var tableView = UITableView()
-
+    
     private lazy var dateFormatter: DateFormatter = {
         let formatter = DateFormatter()
         formatter.dateStyle = .long
@@ -24,22 +24,11 @@ final class ImagesListViewController: UIViewController {
         
         NotificationCenter.default.addObserver(self, selector: #selector(handlePhotosUpdate), name: ImagesListService.didChangeNotification, object: ImagesListService.shared)
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handleLikeUpdate), name: ImagesListService.didChangeLikeNotification, object: ImagesListService.shared)
         ImagesListService.shared.fetchPhotosNextPage()
     }
     
     // MARK: - Private Methods
     
-    @objc private func handleLikeUpdate(_ notification: Notification) {
-        guard let photoId = notification.userInfo?["photoId"] as? String,
-        let index = photos.firstIndex(where: {$0.id == photoId})
-        else { return }
-        
-        photos = service.photos
-        DispatchQueue.main.async { [weak self] in
-            self?.tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
-        }
-    }
     @objc private func handlePhotosUpdate() {
         let oldCount = photos.count
         let newPhotos = service.photos
@@ -78,14 +67,14 @@ final class ImagesListViewController: UIViewController {
         tableView.contentInset = UIEdgeInsets(top: 12, left: 0, bottom: 12, right: 0)
         tableView.backgroundColor = .ypBlackIOS
         tableView.separatorStyle = .none
-        tableView.showsVerticalScrollIndicator = false
-
+        tableView.showsVerticalScrollIndicator = true
+        
     }
     
     private func configCell(for cell: ImagesListCell, with photo: Photo) {
         cell.cellDate.text = dateFormatter.string(from: photo.createdAt ?? Date())
-        cell.cellLike.setImage(UIImage(resource: photo.isLiked ? .activeLike : .inactiveLike), for: .normal)
-       cell.cellImage.contentMode = .center
+        cell.setIsLiked(photo.isLiked)
+        cell.cellImage.contentMode = .center
         cell.cellImage.backgroundColor = .ypBackgroundIOS
         cell.cellImage.kf.indicatorType = .activity
         cell.cellImage.kf.setImage(with:
@@ -97,21 +86,22 @@ final class ImagesListViewController: UIViewController {
                 case .success = result,
                 let self,
                 let cell,
-                let indexPath = self.tableView.indexPath(for: cell)
+                let _ = self.tableView.indexPath(for: cell)
             else {
                 return
             }
-            self.tableView.reloadRows(at: [indexPath], with: .automatic)
             cell.cellImage.contentMode = .scaleAspectFill
             cell.cellImage.backgroundColor = nil
             cell.backgroundColor = nil
+            self.tableView.beginUpdates()
+            self.tableView.endUpdates()
         }
     }
     
     private func showSingleImageVC(withIndex indexPath: IndexPath) {
         let singleImageVC = SingleImageViewController()
-        singleImageVC.image = UIImage(named: photosName[indexPath.row])
         singleImageVC.modalPresentationStyle = .fullScreen
+        singleImageVC.imageUrl = photos[indexPath.row].largeImageURL
         present(singleImageVC, animated: true)
     }
 }
@@ -141,28 +131,18 @@ extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return photos.count
     }
-    
+    // MARK: IMOO
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
         
         guard let imageListCell = cell as? ImagesListCell else {
             return UITableViewCell()
         }
-
+        
+        imageListCell.delegate = self
+        
         let photo = photos[indexPath.row]
         configCell(for: imageListCell, with: photo)
-        imageListCell.onLikeTap = { [weak self] in
-            guard let self = self else { return }
-            let photo = self.photos[indexPath.row]
-            ImagesListService.shared.changeLike(
-                photoId: photo.id,
-                isLiked: photo.isLiked
-            ) { result in
-                if case let .failure(error) = result {
-                    print("Like error:", error)
-                }
-            }
-        }
         return imageListCell
     }
     
@@ -173,10 +153,40 @@ extension ImagesListViewController: UITableViewDataSource {
     ) {
         let amountBeforeEnd = 5
         let triggerIndex = max(0, photos.count - amountBeforeEnd)
-
+        
         if indexPath.row >= triggerIndex {
             print("Loading next page...")
             ImagesListService.shared.fetchPhotosNextPage()
+        }
+    }
+}
+
+extension ImagesListViewController: ImagesListCellDelegate {
+    func imageListCellDidTapLike(_ cell: ImagesListCell) {
+        guard let indexPath = tableView.indexPath(for: cell) else { return }
+        let photo = photos[indexPath.row]
+        let photoId = photo.id
+        UIBlockingProgressHUD.show()
+        
+        ImagesListService.shared.changeLike(photoId: photoId, isLiked: photo.isLiked){ [weak self, weak cell] result in
+            switch result {
+            case .success:
+                DispatchQueue.main.async {
+                    guard let self, let cell else { return }
+                    defer {
+                        UIBlockingProgressHUD.dismiss()
+                    }
+                    self.photos = ImagesListService.shared.photos
+                    if let index = self.photos.firstIndex(where: { $0.id == photoId }) {
+                        cell.setIsLiked(self.photos[index].isLiked)
+                    }
+                }
+            case .failure(let error):
+                print("Failed to change like: \(error)")
+                DispatchQueue.main.async {
+                    UIBlockingProgressHUD.dismiss()
+                }
+            }
         }
     }
 }
