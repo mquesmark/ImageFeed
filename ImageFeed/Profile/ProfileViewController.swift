@@ -1,5 +1,6 @@
 import UIKit
 import Kingfisher
+import Foundation
 
 final class ProfileViewController: UIViewController {
     
@@ -10,13 +11,14 @@ final class ProfileViewController: UIViewController {
     private let exitButton = UIButton()
     
     private var profileImageServiceObserver: NSObjectProtocol?
+    private var animationLayers = [CALayer]()
+    private var infoDidLoaded: Bool = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewElements()
         setConstraints()
         updateProfileDetails()
-        
         profileImageServiceObserver = NotificationCenter.default.addObserver(
             forName: ProfileImageService.didChangeNotification,
             object: nil,
@@ -28,6 +30,11 @@ final class ProfileViewController: UIViewController {
         updateAvatar()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        userPicImageView.layer.cornerRadius = userPicImageView.frame.height / 2
+        addGradientLayer(to: [userPicImageView, personNameLabel, usernameLabel, profileDescriptionLabel])
+    }
     private func setupViewElements() {
         view.backgroundColor = .ypBlackIOS
         
@@ -103,6 +110,8 @@ final class ProfileViewController: UIViewController {
             profileDescriptionLabel.text = profile.bio
             exitButton.isHidden = false
             userPicImageView.isHidden = false
+            infoDidLoaded = true
+            removeGradients()
         }
     }
     
@@ -136,4 +145,37 @@ final class ProfileViewController: UIViewController {
         }
     }
     
+    func addGradientLayer (to views: [UIView]) {
+        
+        
+        for view in views {
+            let gradient = CAGradientLayer()
+            gradient.frame = view.bounds
+            gradient.locations = [0, 0.1, 0.3]
+            gradient.colors = [
+                UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
+                UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
+                UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+            ]
+            gradient.startPoint = CGPoint(x: 0, y: 0.5)
+            gradient.endPoint = CGPoint(x: 1, y: 0.5)
+            gradient.cornerRadius = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : 9
+            gradient.masksToBounds = true
+            view.layer.addSublayer(gradient)
+            animationLayers.append(gradient)
+            
+            let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
+            gradientChangeAnimation.duration = 1
+            gradientChangeAnimation.repeatCount = .infinity
+            gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
+            gradientChangeAnimation.toValue = [0, 0.8, 1]
+            gradientChangeAnimation.isRemovedOnCompletion = false
+            gradient.add(gradientChangeAnimation, forKey: "locationsChange")
+        }
+    }
+    
+    private func removeGradients() {
+        animationLayers.forEach { $0.removeFromSuperlayer() }
+        animationLayers.removeAll()
+    }
 }
