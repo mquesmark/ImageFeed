@@ -54,8 +54,16 @@ final class ProfileViewController: UIViewController {
         profileDescriptionLabel.lineBreakMode = .byWordWrapping
         
         exitButton.setImage(UIImage(named: "Exit"), for: .normal)
-        exitButton.addAction(UIAction { _ in
-            ProfileLogoutService.shared.logout()
+        exitButton.addAction(UIAction { [weak self] _ in
+            guard let self else { return }
+            AlertService.shared.showAlert(withTitle: "Пока, пока!", andMessage: "Уверены, что хотите выйти?", withActions: [
+                UIAlertAction(title: "Да", style: .default){_ in
+                    ProfileLogoutService.shared.logout()
+                },
+                UIAlertAction(title: "Нет", style: .cancel) {_ in
+                    return
+                }
+            ], on: self)
         }, for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.isHidden = true
