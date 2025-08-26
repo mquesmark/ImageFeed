@@ -158,4 +158,4 @@ enum ImagesListServiceError: Error {
 
 struct LikeResponse: Decodable {
     let photo: PhotoResult
-}
+
