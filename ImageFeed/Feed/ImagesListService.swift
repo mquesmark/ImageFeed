@@ -49,7 +49,7 @@ final class ImagesListService {
                     }
                 }
             case .failure(let error):
-                print("Failed to fetch photos: \(error)")
+                print("[fetchPhotosNextPage ImagesListService]: \(error) page=\(nextPage)")
             }
             self?.task = nil
         }
@@ -61,7 +61,7 @@ final class ImagesListService {
     func changeLike(photoId: String, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
         guard likeTask == nil,
             let request = makeURLRequest(forId: photoId, isLiked: isLiked) else {
-            print("Like Task already in progress / Or error in making URLRequest for changing like")
+            print("[changeLike ImagesListService]: invalidRequest photoId=\(photoId) isLiked=\(isLiked)")
             completion(.failure(ImagesListServiceError.invalidRequest))
             return
         }
@@ -75,7 +75,7 @@ final class ImagesListService {
                 }
                 completion(.success(()))
             case .failure(let error):
-            print("Error in changing like: \(error)")
+            print("[changeLike ImagesListService]: \(error) photoId=\(photoId) isLiked=\(isLiked)")
                 completion(.failure(error))
             }
            self?.likeTask = nil
@@ -88,7 +88,7 @@ final class ImagesListService {
     private func makeURLRequest(for page: Int) -> URLRequest? {
         guard page >= 1,
               let token = OAuth2TokenStorage.shared.token,
-              let url = URL(string: "https://api.unsplash.com/photos?page=\(page)&per_page=30") else {
+              let url = URL(string: "https://api.unsplash.com/photos?page=\(page)") else {
             return nil
         }
         
@@ -130,10 +130,10 @@ struct PhotoResult: Decodable {
     let height: Int
     let createdAt: Date?
     let description: String?
-    let urls: Urls
+    let urls: UrlsResult
     let likedByUser: Bool
     
-    struct Urls: Decodable {
+    struct UrlsResult: Decodable {
         let thumb: String
         let full: String
     }

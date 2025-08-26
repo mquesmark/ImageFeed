@@ -22,14 +22,14 @@ final class ImagesListViewController: UIViewController {
         super.viewDidLoad()
         setupTableView()
         
-        NotificationCenter.default.addObserver(self, selector: #selector(handlePhotosUpdate), name: ImagesListService.didChangeNotification, object: ImagesListService.shared)
+        NotificationCenter.default.addObserver(self, selector: #selector(updateTableViewAnimated), name: ImagesListService.didChangeNotification, object: ImagesListService.shared)
         
         ImagesListService.shared.fetchPhotosNextPage()
     }
     
     // MARK: - Private Methods
     
-    @objc private func handlePhotosUpdate() {
+    @objc private func updateTableViewAnimated() {
         let oldCount = photos.count
         let newPhotos = service.photos
         let newPhotosCount = newPhotos.count
@@ -72,7 +72,11 @@ final class ImagesListViewController: UIViewController {
     }
     
     private func configCell(for cell: ImagesListCell, with photo: Photo) {
-        cell.cellDate.text = dateFormatter.string(from: photo.createdAt ?? Date())
+        if let createdAt: Date = photo.createdAt {
+            cell.cellDate.text = dateFormatter.string(from: createdAt)
+        } else {
+            cell.cellDate.text = nil
+        }
         cell.setIsLiked(photo.isLiked)
         cell.cellImage.contentMode = .center
         cell.cellImage.backgroundColor = .ypBackgroundIOS
@@ -131,7 +135,6 @@ extension ImagesListViewController: UITableViewDataSource {
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return photos.count
     }
-    // MARK: IMOO
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: ImagesListCell.reuseIdentifier, for: indexPath)
         
