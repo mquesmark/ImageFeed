@@ -156,8 +156,7 @@ extension ImagesListViewController: UITableViewDataSource {
         willDisplay cell: UITableViewCell,
         forRowAt indexPath: IndexPath
     ) {
-        let amountBeforeEnd = 5
-        let triggerIndex = max(0, photos.count - amountBeforeEnd)
+        let triggerIndex = photos.count - 1
         
         if indexPath.row >= triggerIndex {
             print("Loading next page...")
