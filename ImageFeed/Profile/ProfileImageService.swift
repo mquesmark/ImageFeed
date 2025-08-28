@@ -4,7 +4,7 @@ final class ProfileImageService {
     
     static let shared = ProfileImageService()
     private init() {}
-
+    
     static let didChangeNotification = Notification.Name(rawValue: "ProfileImageProviderDidChange")
     
     private(set) var avatarURL: String?
@@ -21,6 +21,9 @@ final class ProfileImageService {
             let large: String // сделал не small, а large, потому что выглядит невероятно мыльно (что в том числе не соответствует макету, где фото качественно видно  в профиле)
         }
     }
+    func clearImageURL() {
+        avatarURL = nil
+    }
     
     func fetchProfileImage(username: String, _ completion: @escaping (Result<String, Error>) -> Void) {
         task?.cancel()
@@ -33,13 +36,13 @@ final class ProfileImageService {
         task = NetworkClient.shared.objectTask(for: request) {
             [weak self] (result: Result<UserResult, Error>) in
             switch result {
-                case .success(let userResult):
+            case .success(let userResult):
                 let imageURL = userResult.profileImage.large
                 self?.avatarURL = imageURL
                 NotificationCenter.default.post(name: ProfileImageService.didChangeNotification, object: self,
                                                 userInfo: ["URL": imageURL])
                 completion(.success(imageURL))
-
+                
             case .failure(let error):
                 print("❌ [ProfileImageService] Failed to fetch avatar URL: \(error)")
                 completion(.failure(error))
@@ -61,7 +64,7 @@ final class ProfileImageService {
         guard let url = URL(string: "https://api.unsplash.com/users/\(username)") else {
             return nil
         }
-            var request = URLRequest (url: url)
+        var request = URLRequest (url: url)
         request.httpMethod = "GET"
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         return request

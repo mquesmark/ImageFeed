@@ -1,23 +1,20 @@
 import UIKit
+import Kingfisher
 
 final class SingleImageViewController: UIViewController {
     
+    // MARK: - Public Properties
+    var imageUrl: String?
+    
     // MARK: - Private Properties
+    
     private var imageView = UIImageView()
     private var scrollView = UIScrollView()
     private var backButton = UIButton(type: .custom)
     private var shareButton = UIButton(type: .custom)
     
-    // MARK: - Public Properties
-    
-    var image: UIImage? {
-        didSet {
-            guard isViewLoaded, let image else { return }
-            imageView.image = image
-            imageView.frame.size = image.size
-            rescaleAndCenter(image: image)
-        }
-    }
+    private var imageViewEdgeConstraints: [NSLayoutConstraint] = []
+    private var imageViewSizeConstraints: [NSLayoutConstraint] = []
     
     // MARK: - Lifecycle
     
@@ -26,43 +23,81 @@ final class SingleImageViewController: UIViewController {
         setupViews()
         setupActions()
         setupConstraints()
-        
-        guard let image else { return }
-        imageView.image = image
-        imageView.frame.size = image.size
-        rescaleAndCenter(image: image)
+        setImage()
     }
-
+    
+    // MARK: - Private Methods
+    
+    private func showError() {
+        let actions = [
+            UIAlertAction(title: "Не надо", style: .cancel) { [weak self] _ in
+                self?.dismiss(animated: true)
+            },
+            UIAlertAction(title: "Повторить", style: .default){[weak self] _ in
+                self?.setImage()
+            }
+        ]
+        AlertService.shared.showAlert(withTitle: "Что-то пошло не так", andMessage: "Попробовать ещё раз?", withActions: actions, on: self)    }
+    
+    private func setImage() {
+        guard let imageUrl,
+              let url = URL(string: imageUrl) else {
+            print("No image URL")
+            return
+        }
+        
+        UIBlockingProgressHUD.show()
+        imageView.kf.setImage(with: url, placeholder: UIImage(resource: .stub)) { [weak self] result in
+            UIBlockingProgressHUD.dismiss()
+            guard let self else { return }
+            
+            switch result {
+            case .success(let value):
+                self.deactivateImageViewTempConstraints()
+                self.imageView.frame.size = value.image.size
+                self.imageView.contentMode = .scaleAspectFit
+                self.rescaleAndCenter(image: value.image)
+                
+            case .failure(let error):
+                self.showError()
+                print("Error in downloading image: \(error)")
+                return
+            }
+        }
+    }
     private func setupViews() {
         view.backgroundColor = .ypBlackIOS
         backButton.translatesAutoresizingMaskIntoConstraints = false
         shareButton.translatesAutoresizingMaskIntoConstraints = false
         scrollView.translatesAutoresizingMaskIntoConstraints = false
-
+        imageView.translatesAutoresizingMaskIntoConstraints = false
+        
         view.addSubview(scrollView)
         view.addSubview(backButton)
         view.addSubview(shareButton)
         scrollView.addSubview(imageView)
+        imageView.frame.size = view.frame.size
+        imageView.contentMode = .center
     }
-
+    
     private func setupActions() {
-
+        
         backButton.setImage(UIImage(resource: .backward), for: .normal)
         let backAction = UIAction { [weak self] _ in
             self?.dismiss(animated: true)
         }
         backButton.addAction(backAction, for: .touchUpInside)
-
+        
         shareButton.setImage(UIImage(resource: .sharing), for: .normal)
         let shareAction = UIAction { [weak self] _ in
             self?.didTapShareButton()
         }
         shareButton.addAction(shareAction, for: .touchUpInside)
-
+        
         scrollView.delegate = self
         scrollView.minimumZoomScale = 0.1
         scrollView.maximumZoomScale = 1.25
-
+        
         let swipeDownGesture = UISwipeGestureRecognizer(target: self, action: #selector(handleSwipeBack))
         swipeDownGesture.direction = .down
         view.addGestureRecognizer(swipeDownGesture)
@@ -83,12 +118,32 @@ final class SingleImageViewController: UIViewController {
             scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
             scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
             scrollView.topAnchor.constraint(equalTo: view.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor)
+            scrollView.bottomAnchor.constraint(equalTo: view.bottomAnchor),
         ])
+        
+        imageViewEdgeConstraints = [
+            imageView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            imageView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            imageView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            imageView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor)
+        ]
+        
+        imageViewSizeConstraints = [
+            imageView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            imageView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor)
+        ]
+        
+        NSLayoutConstraint.activate(imageViewEdgeConstraints + imageViewSizeConstraints)
     }
     
+    private func deactivateImageViewTempConstraints() {
+        NSLayoutConstraint.deactivate(imageViewEdgeConstraints + imageViewSizeConstraints)
+        imageViewEdgeConstraints.removeAll()
+        imageViewSizeConstraints.removeAll()
+        imageView.translatesAutoresizingMaskIntoConstraints = true
+    }
     private func didTapShareButton() {
-        guard let image else { return }
+        guard let image = imageView.image else { return }
         
         let activityVC = UIActivityViewController(activityItems: [image], applicationActivities: nil)
         present(activityVC, animated: true)
@@ -111,7 +166,7 @@ extension SingleImageViewController: UIScrollViewDelegate {
     }
 }
 
-// MARK: - Private Methods
+// MARK: - Zoom Private Methods
 
 extension SingleImageViewController {
     private func rescaleAndCenter(image: UIImage) {

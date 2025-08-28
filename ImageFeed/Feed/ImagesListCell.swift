@@ -7,6 +7,7 @@ final class ImagesListCell: UITableViewCell {
     let cellLike = UIButton()
     let cellDate = UILabel()
     let gradientOverlay = UIView()
+    weak var delegate: ImagesListCellDelegate?
     
     static let reuseIdentifier = "ImagesListCell"
     
@@ -14,6 +15,13 @@ final class ImagesListCell: UITableViewCell {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         setupViews()
         setupConstraintsAndVisuals()
+        
+        cellLike.addAction(UIAction { [weak self] _ in
+            guard let self else {
+                return
+            }
+            likeButtonClicked()
+        }, for: .touchUpInside)
     }
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
@@ -21,7 +29,17 @@ final class ImagesListCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
+        cellImage.kf.cancelDownloadTask()
         cellImage.image = nil
+        cellImage.contentMode = .center
+    }
+
+    private func likeButtonClicked() {
+        delegate?.imageListCellDidTapLike(self)
+    }
+    
+    func setIsLiked(_ isLiked: Bool) {
+        cellLike.setImage(isLiked ? UIImage(resource: .activeLike) : UIImage(resource: .inactiveLike), for: .normal)
     }
     
     private func setupViews() {
@@ -80,4 +98,5 @@ final class ImagesListCell: UITableViewCell {
         gradient.frame = CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width - 32, height: 30)
         return gradient
     }
+    
 }
