@@ -1,6 +1,11 @@
 import UIKit
 
 final class ImagesListViewController: UIViewController {
+    private enum Constants {
+        static let minimumCellHeight: CGFloat = 44
+        static let cellInsets: CGFloat = 32
+        static let cellSpacing: CGFloat = 8
+    }
     let service = ImagesListService.shared
     
     var photos: [Photo] = []
@@ -116,17 +121,14 @@ extension ImagesListViewController: UITableViewDelegate {
         showSingleImageVC(withIndex: indexPath)
     }
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        
         let image = photos[indexPath.row]
-        
         guard image.size.width > 0 else {
-            return 44
+            return Constants.minimumCellHeight
         }
-        
-        let realTableViewWidth = tableView.bounds.width - 32
+        let realTableViewWidth = tableView.bounds.width - Constants.cellInsets
         let imageAspectRatio = image.size.height / image.size.width
         let imageViewHeight = realTableViewWidth * imageAspectRatio
-        return imageViewHeight + 8
+        return imageViewHeight + Constants.cellSpacing
     }
 }
 

@@ -19,45 +19,23 @@ final class ImagesListService {
             return
         }
         task = NetworkClient.shared.objectTask(for: request) { [weak self] (result: Result<[PhotoResult], Error>) in
+            guard let self else { return }
+
             switch result {
             case .success(let items):
-                let newPhotos: [Photo] = items.map { photo in
-                    Photo(
-                        id: photo.id,
-                        size: CGSize(width: photo.width, height: photo.height),
-                        createdAt: photo.createdAt,
-                        welcomeDescription: photo.description,
-                        thumbImageURL: photo.urls.thumb,
-                        largeImageURL: photo.urls.full,
-                        isLiked: photo.likedByUser
-                    )
-                }
-                
-                DispatchQueue.main.async { [weak self] in
-                    guard let self else { return }
-                    let existingIDs = Set(self.photos.map { $0.id })
-                    let uniqueNew = newPhotos.filter { !existingIDs.contains($0.id) }
-
-                    self.photos.append(contentsOf: uniqueNew)
-                    self.lastLoadedPage = nextPage
-
-                    if !uniqueNew.isEmpty {
-                        NotificationCenter.default.post(
-                            name: ImagesListService.didChangeNotification,
-                            object: self
-                        )
-                    }
-                }
+                self.handlePhotosResponse(items, nextPage: nextPage)
             case .failure(let error):
-                print("[fetchPhotosNextPage ImagesListService]: \(error) page=\(nextPage)")
+                self.handlePhotosError(error, page: nextPage)
             }
-            self?.task = nil
+            self.task = nil
         }
     }
+    
     func clearFeed() {
         photos = []
         lastLoadedPage = 0
     }
+    
     func changeLike(photoId: String, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void) {
         guard likeTask == nil,
             let request = makeURLRequest(forId: photoId, isLiked: isLiked) else {
@@ -84,6 +62,49 @@ final class ImagesListService {
 
         
     // MARK: - Private methods
+
+    private func handlePhotosResponse(_ items: [PhotoResult], nextPage: Int) {
+        let newPhotos = mapPhotoResults(items)
+        appendUnique(newPhotos, nextPage: nextPage)
+    }
+
+    private func mapPhotoResults(_ items: [PhotoResult]) -> [Photo] {
+        return items.map { photo in
+            Photo(
+                id: photo.id,
+                size: CGSize(width: photo.width, height: photo.height),
+                createdAt: photo.createdAt,
+                welcomeDescription: photo.description,
+                thumbImageURL: photo.urls.thumb,
+                largeImageURL: photo.urls.full,
+                isLiked: photo.likedByUser
+            )
+        }
+    }
+
+    private func appendUnique(_ newPhotos: [Photo], nextPage: Int) {
+        DispatchQueue.main.async { [weak self] in
+            guard let self else { return }
+            let existingIDs = Set(self.photos.map { $0.id })
+            let uniqueNew = newPhotos.filter { !existingIDs.contains($0.id) }
+
+            self.photos.append(contentsOf: uniqueNew)
+            self.lastLoadedPage = nextPage
+            self.postDidChangeIfNeeded(uniqueNew)
+        }
+    }
+
+    private func postDidChangeIfNeeded(_ newPhotos: [Photo]) {
+        guard !newPhotos.isEmpty else { return }
+        NotificationCenter.default.post(
+            name: ImagesListService.didChangeNotification,
+            object: self
+        )
+    }
+
+    private func handlePhotosError(_ error: Error, page: Int) {
+        print("[fetchPhotosNextPage ImagesListService]: \(error) page=\(page)")
+    }
     
     private func makeURLRequest(for page: Int) -> URLRequest? {
         guard page >= 1,
@@ -113,17 +134,7 @@ final class ImagesListService {
 }
 
 
-
-struct Photo {
-    let id: String
-    let size: CGSize
-    let createdAt: Date?
-    let welcomeDescription: String?
-    let thumbImageURL: String
-    let largeImageURL: String
-    var isLiked: Bool
-}
-
+// MARK: - Models
 struct PhotoResult: Decodable {
     let id: String
     let width: Int
