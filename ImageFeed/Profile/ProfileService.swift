@@ -5,7 +5,7 @@ final class ProfileService {
     static let shared = ProfileService()
     private init() {}
     
-    private(set) var profile: Profile?
+    var profile: Profile?
     
     private var task : URLSessionTask?
     struct ProfileResult: Codable {

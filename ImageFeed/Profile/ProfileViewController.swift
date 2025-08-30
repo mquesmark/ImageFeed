@@ -1,7 +1,18 @@
 import UIKit
 import Kingfisher
+@MainActor
+protocol ProfileViewControllerProtocol: AnyObject {
+    func showProfileDetails(
+        personName: String,
+        username: String,
+        profileDescription: String
+        )
+    func showAvatar(url: URL)
+    func showLogoutAlert()
+}
 
-final class ProfileViewController: UIViewController {
+@MainActor
+final class ProfileViewController: UIViewController, ProfileViewControllerProtocol {
     
     private let userPicImageView = UIImageView()
     private let personNameLabel = UILabel()
@@ -9,23 +20,13 @@ final class ProfileViewController: UIViewController {
     private let profileDescriptionLabel = UILabel()
     private let exitButton = UIButton()
     
-    private var profileImageServiceObserver: NSObjectProtocol?
+    var presenter: ProfilePresenterProtocol?
     
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViewElements()
         setConstraints()
-        updateProfileDetails()
-        
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self else { return }
-            self.updateAvatar()
-        }
-        updateAvatar()
+        presenter?.viewDidLoad()
     }
     
     private func setupViewElements() {
@@ -55,15 +56,7 @@ final class ProfileViewController: UIViewController {
         
         exitButton.setImage(UIImage(named: "Exit"), for: .normal)
         exitButton.addAction(UIAction { [weak self] _ in
-            guard let self else { return }
-            AlertService.shared.showAlert(withTitle: "Пока, пока!", andMessage: "Уверены, что хотите выйти?", withActions: [
-                UIAlertAction(title: "Да", style: .default){_ in
-                    ProfileLogoutService.shared.logout()
-                },
-                UIAlertAction(title: "Нет", style: .cancel) {_ in
-                    return
-                }
-            ], on: self)
+            self?.presenter?.didTapLogout()
         }, for: .touchUpInside)
         exitButton.translatesAutoresizingMaskIntoConstraints = false
         exitButton.isHidden = true
@@ -104,21 +97,21 @@ final class ProfileViewController: UIViewController {
         }
     }
     
-    private func updateProfileDetails() {
-        if let profile = ProfileService.shared.profile {
-            personNameLabel.text = profile.name
-            usernameLabel.text = profile.loginName
-            profileDescriptionLabel.text = profile.bio
+    func showProfileDetails(
+        personName: String,
+        username: String,
+        profileDescription: String,
+        
+    ) {
+            personNameLabel.text = personName
+            usernameLabel.text = username
+            profileDescriptionLabel.text = profileDescription
             exitButton.isHidden = false
             userPicImageView.isHidden = false
-        }
+        
     }
     
-    private func updateAvatar () {
-        guard
-            let profileImageURL = ProfileImageService.shared.avatarURL,
-            let url = URL(string: profileImageURL)
-        else { return }
+    func showAvatar (url: URL) {
         let placeholderImage = UIImage(named: "no_profile_pic")
         let processor = RoundCornerImageProcessor(cornerRadius: 35)
         userPicImageView.kf.indicatorType = .activity
@@ -144,4 +137,15 @@ final class ProfileViewController: UIViewController {
         }
     }
     
+    
+    func showLogoutAlert() {
+        AlertService.shared.showAlert(withTitle: "Пока, пока!", andMessage: "Уверены, что хотите выйти?", withActions: [
+            UIAlertAction(title: "Да", style: .default){_ in
+                self.presenter?.userConfirmedLogout()
+            },
+            UIAlertAction(title: "Нет", style: .cancel) {_ in
+                return
+            }
+        ], on: self)
+    }
 }
