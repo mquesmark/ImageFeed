@@ -84,6 +84,17 @@ final class ProfilePresenterTests: XCTestCase {
         // Then
         XCTAssertFalse(view.didShowAvatar)
     }
+    
+    func testDidTapLogoutAlertShowsLogoutAlert() {
+        let view = MockProfileView()
+        let presenter = ProfilePresenter()
+        presenter.view = view
+        
+        presenter.didTapLogout()
+        
+        XCTAssertTrue(view.didShowLogoutAlert)
+        
+    }
 }
 
 @MainActor
@@ -94,9 +105,10 @@ final class MockProfileView: ProfileViewControllerProtocol {
     var lastUsername = ""
     var lastBio = ""
     var lastURL: URL?
+    
     var didShowDetails = false
     var didShowAvatar = false
-    
+    var didShowLogoutAlert = false
     func showProfileDetails(
         personName: String,
         username: String,
@@ -114,7 +126,7 @@ final class MockProfileView: ProfileViewControllerProtocol {
     }
     
     func showLogoutAlert() {
-        
+        didShowLogoutAlert = true
     }
     
 }
