@@ -76,6 +76,7 @@ final class SingleImageViewController: UIViewController {
         view.addSubview(backButton)
         view.addSubview(shareButton)
         scrollView.addSubview(imageView)
+        backButton.accessibilityIdentifier = "backButton"
         imageView.frame.size = view.frame.size
         imageView.contentMode = .center
     }

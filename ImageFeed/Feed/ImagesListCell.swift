@@ -40,12 +40,14 @@ final class ImagesListCell: UITableViewCell {
     
     func setIsLiked(_ isLiked: Bool) {
         cellLike.setImage(isLiked ? UIImage(resource: .activeLike) : UIImage(resource: .inactiveLike), for: .normal)
+        cellLike.accessibilityValue = isLiked ? "on" : "off"
     }
     
     private func setupViews() {
         contentView.addSubview(cellImage)
         contentView.addSubview(gradientOverlay)
         contentView.addSubview(cellLike)
+        cellLike.accessibilityIdentifier = "likeButton"
         contentView.addSubview(cellDate)
     }
     private func setupConstraintsAndVisuals() {

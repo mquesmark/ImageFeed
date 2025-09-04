@@ -1,11 +1,15 @@
 import UIKit
-
-final class ImagesListService {
+protocol ImagesListServiceProtocol {
+    var photos: [Photo] { get set }
+    func changeLike(photoId: String, isLiked: Bool, completion: @escaping (Result<Void, Error>) -> Void)
+    func fetchPhotosNextPage()
+}
+final class ImagesListService: ImagesListServiceProtocol {
     static let didChangeNotification = Notification.Name("ImagesListServiceDidChange")
     static let shared = ImagesListService()
     private init() {}
     
-    private(set) var photos: [Photo] = []
+    var photos: [Photo] = []
     private var lastLoadedPage: Int?
     private var task: URLSessionTask?
     private var likeTask: URLSessionTask?

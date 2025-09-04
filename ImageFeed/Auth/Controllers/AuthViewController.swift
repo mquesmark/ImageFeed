@@ -24,26 +24,33 @@ final class AuthViewController: UIViewController {
         super.viewWillAppear(animated)
         view.endEditing(true)
     }
-
-
+    
+    
     private func setupViewElements() {
         view.backgroundColor = .ypBlackIOS
         view.addSubview(unsplashLogo)
         view.addSubview(loginButton)
-
+        
         unsplashLogo.image = UIImage(named: "auth_screen_logo")
-    
+        
         loginButton.setTitleColor(.ypBlackIOS, for: .normal)
         loginButton.backgroundColor = .ypWhiteIOS
         loginButton.setTitle("Войти", for: .normal)
         loginButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         loginButton.layer.cornerRadius = 16
         loginButton.clipsToBounds = true
-        
+        loginButton.accessibilityIdentifier = "Authenticate"
         let action = UIAction { [weak self] _ in
             guard let self else { return }
-        let webVC = WebViewViewController()
+            
+            let webVC = WebViewViewController()
+            let authHelper = AuthHelper()
+            let presenter = WebViewPresenter(authHelper: authHelper)
+            
+            webVC.presenter = presenter
+            presenter.view = webVC
             webVC.delegate = self
+            
             navigationController?.pushViewController(webVC, animated: true)
         }
         loginButton.addAction(action, for: .touchUpInside)
@@ -86,7 +93,7 @@ extension AuthViewController: WebViewViewControllerDelegate {
                 UIBlockingProgressHUD.dismiss()
                 return
             }
-
+            
             self.oauth2Service.fetchOAuthToken(code: code) { result in
                 switch result {
                 case .success(let token):
