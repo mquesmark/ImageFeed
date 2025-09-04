@@ -15,12 +15,18 @@ protocol ImagesListPresenterProtocol: AnyObject {
 final class ImagesListPresenter: ImagesListPresenterProtocol {
     
     weak var view: ImagesListViewProtocol?
-    private let service = ImagesListService.shared
     private var photoCount = 0
     private var observer: NSObjectProtocol?
+    var service: ImagesListServiceProtocol
+    
+    init(service: ImagesListServiceProtocol) {
+        self.service = service
+    }
     
     var numberOfPhotos: Int { service.photos.count }
     func photo(at indexPath: IndexPath) -> Photo { service.photos[indexPath.row] }
+    
+    
     
     func viewDidLoad() {
         photoCount = service.photos.count

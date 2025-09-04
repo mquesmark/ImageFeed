@@ -33,7 +33,7 @@ final class ImagesListViewController: UIViewController, ImagesListViewProtocol {
     override func viewDidLoad() {
         super.viewDidLoad()
         if presenter == nil {
-            presenter = ImagesListPresenter()
+            presenter = ImagesListPresenter(service: ImagesListService.shared)
         }
         presenter?.view = self
         presenter?.viewDidLoad()
