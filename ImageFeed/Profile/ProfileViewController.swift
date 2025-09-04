@@ -26,9 +26,17 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
         super.viewDidLoad()
         setupViewElements()
         setConstraints()
+        if presenter == nil {
+            presenter = ProfilePresenter()
+        }
+        presenter?.view = self
         presenter?.viewDidLoad()
     }
     
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        userPicImageView.layer.cornerRadius = userPicImageView.bounds.height / 2
+    }
     private func setupViewElements() {
         view.backgroundColor = .ypBlackIOS
         
@@ -91,16 +99,12 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
             exitButton.heightAnchor.constraint(equalToConstant: 44),
             exitButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16)
         ])
-        
-        DispatchQueue.main.async {
-            self.userPicImageView.layer.cornerRadius = self.userPicImageView.bounds.height / 2
-        }
     }
     
     func showProfileDetails(
         personName: String,
         username: String,
-        profileDescription: String,
+        profileDescription: String
         
     ) {
             personNameLabel.text = personName
@@ -140,8 +144,8 @@ final class ProfileViewController: UIViewController, ProfileViewControllerProtoc
     
     func showLogoutAlert() {
         AlertService.shared.showAlert(withTitle: "Пока, пока!", andMessage: "Уверены, что хотите выйти?", withActions: [
-            UIAlertAction(title: "Да", style: .default){_ in
-                self.presenter?.userConfirmedLogout()
+            UIAlertAction(title: "Да", style: .default){ [weak self] _ in
+                self?.presenter?.userConfirmedLogout()
             },
             UIAlertAction(title: "Нет", style: .cancel) {_ in
                 return
