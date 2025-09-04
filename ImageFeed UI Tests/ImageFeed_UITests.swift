@@ -51,21 +51,29 @@ final class ImageFeed_UITests: XCTestCase {
         sleep(2)
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 1)
-        
         let likeButton = cellToLike.buttons["likeButton"]
+
+        XCTAssertTrue(likeButton.waitForExistence(timeout: 10))
+        
         likeButton.tap()
         
-        sleep(5)
-        
+        let onPredicate = NSPredicate(format: "value == 'on'")
+        expectation(for: onPredicate, evaluatedWith: likeButton)
+        waitForExpectations(timeout: 5)
+
         likeButton.tap()
+        let offPredicate = NSPredicate(format: "value == 'off'")
+        expectation(for: offPredicate, evaluatedWith: likeButton)
+        waitForExpectations(timeout: 5)
+
         
-        sleep(5)
+        sleep(2)
+        
         let cellImage = cellToLike.images.firstMatch
         if cellImage.exists && cellImage.isHittable {
             cellImage.tap()
         } else {
-            let cellCenter = cell.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5))
-            cellCenter.tap()
+            XCTFail()
         }
         
         sleep(2)
