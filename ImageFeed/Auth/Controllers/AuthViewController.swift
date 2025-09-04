@@ -39,7 +39,7 @@ final class AuthViewController: UIViewController {
         loginButton.titleLabel?.font = UIFont.systemFont(ofSize: 17, weight: .semibold)
         loginButton.layer.cornerRadius = 16
         loginButton.clipsToBounds = true
-        
+        loginButton.accessibilityIdentifier = "Authenticate"
         let action = UIAction { [weak self] _ in
             guard let self else { return }
             

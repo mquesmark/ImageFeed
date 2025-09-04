@@ -1,5 +1,6 @@
 import UIKit
 import ProgressHUD
+import WebKit
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
     func application(_ application: UIApplication, configurationForConnecting connectingSceneSession: UISceneSession, options: UIScene.ConnectionOptions) -> UISceneConfiguration {
@@ -18,7 +19,9 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         ProgressHUD.animationType = .activityIndicator
         ProgressHUD.colorHUD = .white
         ProgressHUD.colorAnimation = .black
+        
         return true
     }
+    
 }
 
