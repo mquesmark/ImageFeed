@@ -108,5 +108,5 @@ final class ImageFeed_UITests: XCTestCase {
 
 struct LoginData {
     let login = "maximgv@icloud.com"
-    let password = "dontStealMyPassword19122002"
+    let password = "dontStealMyPassword19122002" // Я случайно запушил на github свой пароль, но так как он все равно временный и только для unsplash, нигде не больше не используется, поэтому пусть для удобства ревью остается. Аккаунт мне там если что не жалко))
 }
