@@ -74,13 +74,24 @@ final class ImageFeed_UITests: XCTestCase {
         let cell = tablesQuery.children(matching: .cell).element(boundBy: 0)
         waitToAppear(cell)
         
-        cell.swipeUp(velocity: .slow)
+        cell.swipeUp()
         
         gentlePause(for: 2)
+
+        /// ВАРИАНТ 1:
+//        anotherCell.swipeDown()
+
+        /// ВАРИАНТ 2:
+//        let anotherCell = tablesQuery.children(matching: .cell).element(boundBy: 2)
+//        waitToAppear(anotherCell)
+    
+        /// ВАРИАНТ 3:
+//        gentlePause(for: 5)
+//        tablesQuery.tables.element.swipeDown()
         
-        let anotherCell = tablesQuery.children(matching: .cell).element(boundBy: 2)
-        waitToAppear(anotherCell)
-        anotherCell.swipeDown()
+        /// ВАРИАНТ 4, единственный который вроде как работает, но мне непонятно почему верхние не работают нормально :/
+        let topCoordinate = app.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.01))
+        topCoordinate.tap()
         
         let cellToLike = tablesQuery.children(matching: .cell).element(boundBy: 1)
         waitToAppear(cellToLike)
@@ -90,7 +101,6 @@ final class ImageFeed_UITests: XCTestCase {
         
         
         likeButton.tap()
-        
         
         gentlePause(for: 10)
         

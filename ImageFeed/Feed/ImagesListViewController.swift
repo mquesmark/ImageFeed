@@ -43,8 +43,6 @@ final class ImagesListViewController: UIViewController, ImagesListViewProtocol {
     func insertRows(at indexPaths: [IndexPath]) {
         tableView.performBatchUpdates {
             tableView.insertRows(at: indexPaths, with: .automatic)
-        } completion: { _ in
-            self.tableView.reloadData()
         }
     }
 
