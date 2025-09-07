@@ -113,7 +113,7 @@ final class ImagesListService: ImagesListServiceProtocol {
     private func makeURLRequest(for page: Int) -> URLRequest? {
         guard page >= 1,
               let token = OAuth2TokenStorage.shared.token,
-              let url = URL(string: "https://api.unsplash.com/photos?page=\(page)") else {
+              let url = URL(string: "https://api.unsplash.com/photos?page=\(page)&per_page=10") else {
             return nil
         }
         
