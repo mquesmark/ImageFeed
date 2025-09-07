@@ -8,6 +8,7 @@ final class AlertService {
         withTitle title: String,
         andMessage message: String?,
         withActions actions: [UIAlertAction] = [UIAlertAction(title: "ОК", style: .default)],
+        withAccessibilityIdentifier accessibilityIdentifier: String? = nil,
         on viewController: UIViewController
     ) {
         DispatchQueue.main.async{
@@ -16,7 +17,10 @@ final class AlertService {
                                           preferredStyle: .alert)
             
             actions.forEach({alert.addAction($0)})
+            alert.view.accessibilityIdentifier = accessibilityIdentifier
             viewController.present(alert, animated: true)
         }
+        
+        
     }
 }
