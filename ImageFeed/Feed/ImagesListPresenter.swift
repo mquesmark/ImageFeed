@@ -1,5 +1,5 @@
 import Foundation
-
+import UIKit
 @MainActor
 protocol ImagesListPresenterProtocol: AnyObject {
     var view: ImagesListViewProtocol? { get set }
@@ -46,6 +46,10 @@ final class ImagesListPresenter: ImagesListPresenterProtocol {
     }
     
     func willDisplayRow(at indexPath: IndexPath) {
+        if let appDelegate = UIApplication.shared.delegate as? AppDelegate,
+           appDelegate.isUITestPaginationDisabled {
+            return
+        }
         let triggerIndex = service.photos.count - 1
         if indexPath.row >= triggerIndex {
             service.fetchPhotosNextPage()

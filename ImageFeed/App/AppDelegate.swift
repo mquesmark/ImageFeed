@@ -23,5 +23,7 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         return true
     }
     
+    var isUITestPaginationDisabled: Bool {
+        ProcessInfo.processInfo.arguments.contains("UITEST_DISABLE_PAGINATION")
+    }
 }
-

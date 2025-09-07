@@ -12,6 +12,8 @@ final class ProfilePresenter: ProfilePresenterProtocol {
     weak var view: ProfileViewControllerProtocol?
     private var avatarObserver: NSObjectProtocol?
     
+    // MARK: - Lifecycle
+    
     func viewDidLoad() {
         updateProfileDetails()
         updateAvatar()
@@ -26,6 +28,19 @@ final class ProfilePresenter: ProfilePresenterProtocol {
             }
         }
     }
+    
+// MARK: - Public Methods
+    
+    func didTapLogout() {
+        view?.showLogoutAlert()
+    }
+    
+    func userConfirmedLogout() {
+        ProfileLogoutService.shared.logout()
+    }
+    
+    // MARK: - Private Methods
+    
     private func updateProfileDetails() {
         if let profile = ProfileService.shared.profile {
             view?.showProfileDetails(
@@ -42,20 +57,6 @@ final class ProfilePresenter: ProfilePresenterProtocol {
         else { return }
         view?.showAvatar(url: url)
     }
-    
-    func didTapLogout() {
-        view?.showLogoutAlert()
-    }
-    
-    func userConfirmedLogout() {
-        ProfileLogoutService.shared.logout()
-    }
-    
-    
-    
-    
-    
-    
     
     
     deinit {
