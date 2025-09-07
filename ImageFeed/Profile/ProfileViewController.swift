@@ -21,9 +21,9 @@ final class ProfileViewController: UIViewController,
     private let usernameLabel = UILabel()
     private let profileDescriptionLabel = UILabel()
     private let exitButton = UIButton()
+    private let debugSkeletonButton = UIButton(type: .system)
 
     var presenter: ProfilePresenterProtocol?
-    private var profileImageServiceObserver: NSObjectProtocol?
     private var animationLayers = [CALayer]()
     private var infoDidLoaded: Bool = false
     
@@ -36,20 +36,20 @@ final class ProfileViewController: UIViewController,
         }
         presenter?.view = self
         presenter?.viewDidLoad()
-        profileImageServiceObserver = NotificationCenter.default.addObserver(
-            forName: ProfileImageService.didChangeNotification,
-            object: nil,
-            queue: .main
-        ) { [weak self] _ in
-            guard let self else { return }
-            self.updateAvatar()
-        }
     }
 
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         userPicImageView.layer.cornerRadius = userPicImageView.bounds.height / 2
-        addGradientLayer(to: [userPicImageView, personNameLabel, usernameLabel, profileDescriptionLabel])
+        updateGradientFramesIfNeeded()
+    }
+    
+    private func updateGradientFramesIfNeeded() {
+        for layer in animationLayers {
+            guard let bounds = layer.superlayer?.bounds else { continue }
+            layer.frame = bounds
+            layer.cornerRadius = (layer.superlayer?.cornerRadius ?? 0) > 0 ? (layer.superlayer?.cornerRadius ?? 0) : 9
+        }
     }
     
     private func setupViewElements() {
@@ -58,7 +58,7 @@ final class ProfileViewController: UIViewController,
         userPicImageView.translatesAutoresizingMaskIntoConstraints = false
         userPicImageView.image = UIImage(named: "no_profile_pic")
         userPicImageView.clipsToBounds = true
-        userPicImageView.isHidden = true
+        userPicImageView.isHidden = false
 
         personNameLabel.text = ""
         personNameLabel.font = UIFont.systemFont(ofSize: 23, weight: .bold)
@@ -94,6 +94,25 @@ final class ProfileViewController: UIViewController,
         view.addSubview(profileDescriptionLabel)
         view.addSubview(exitButton)
 
+        // DEBUG: toggle skeleton animations
+        let iconName = "stop.circle" // will be updated after setSkeletonActive in viewDidLoad
+        debugSkeletonButton.setImage(UIImage(systemName: iconName), for: .normal)
+        debugSkeletonButton.imageView?.contentMode = .scaleAspectFit
+        let symbolConfig = UIImage.SymbolConfiguration(pointSize: 16, weight: .semibold)
+        debugSkeletonButton.setPreferredSymbolConfiguration(symbolConfig, forImageIn: .normal)
+        debugSkeletonButton.adjustsImageWhenHighlighted = false
+        debugSkeletonButton.tintColor = .white
+        debugSkeletonButton.backgroundColor = UIColor.white.withAlphaComponent(0.12)
+        debugSkeletonButton.layer.cornerRadius = 18
+        debugSkeletonButton.layer.masksToBounds = true
+        debugSkeletonButton.layer.borderWidth = 1
+        debugSkeletonButton.layer.borderColor = UIColor.white.withAlphaComponent(0.18).cgColor
+        debugSkeletonButton.translatesAutoresizingMaskIntoConstraints = false
+        debugSkeletonButton.accessibilityIdentifier = "debugSkeletonButton"
+        debugSkeletonButton.addAction(UIAction { [weak self] _ in
+            self?.didTapDebugSkeleton()
+        }, for: .touchUpInside)
+        view.addSubview(debugSkeletonButton)
     }
 
     private func setConstraints() {
@@ -142,6 +161,11 @@ final class ProfileViewController: UIViewController,
                 equalTo: view.safeAreaLayoutGuide.trailingAnchor,
                 constant: -16
             ),
+
+            debugSkeletonButton.topAnchor.constraint(equalTo: exitButton.bottomAnchor, constant: 8),
+            debugSkeletonButton.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor, constant: -16),
+            debugSkeletonButton.heightAnchor.constraint(equalToConstant: 36),
+            debugSkeletonButton.widthAnchor.constraint(equalToConstant: 36),
         ])
     }
 
@@ -155,9 +179,7 @@ final class ProfileViewController: UIViewController,
         usernameLabel.text = username
         profileDescriptionLabel.text = profileDescription
         exitButton.isHidden = false
-        userPicImageView.isHidden = false
-        infoDidLoaded = true
-        removeGradients()
+        setSkeletonActive(false)
     }
 
     func showAvatar(url: URL) {
@@ -209,37 +231,75 @@ final class ProfileViewController: UIViewController,
 
     }
     
+    @objc private func didTapDebugSkeleton() {
+        if infoDidLoaded { // currently content shown, skeleton OFF -> turn ON
+            setSkeletonActive(true)
+        } else { // skeleton ON -> turn OFF
+            setSkeletonActive(false)
+        }
+    }
+    
     func addGradientLayer (to views: [UIView]) {
-        
-        
         for view in views {
+            if (view.layer.sublayers?.contains(where: { $0.name == "shimmer" })) == true {
+                continue
+            }
             let gradient = CAGradientLayer()
+            gradient.name = "shimmer"
+            // Fit gradient exactly to the view bounds; we'll move the highlight via locations
             gradient.frame = view.bounds
-            gradient.locations = [0, 0.1, 0.3]
+
+            // Colors for shimmer: dark – light – dark
             gradient.colors = [
-                UIColor(red: 0.682, green: 0.686, blue: 0.706, alpha: 1).cgColor,
-                UIColor(red: 0.531, green: 0.533, blue: 0.553, alpha: 1).cgColor,
-                UIColor(red: 0.431, green: 0.433, blue: 0.453, alpha: 1).cgColor
+                UIColor(white: 0.45, alpha: 1).cgColor,
+                UIColor(white: 0.60, alpha: 1).cgColor,
+                UIColor(white: 0.45, alpha: 1).cgColor
             ]
+            gradient.locations = [-1, -0.5, 0] as [NSNumber]
             gradient.startPoint = CGPoint(x: 0, y: 0.5)
             gradient.endPoint = CGPoint(x: 1, y: 0.5)
             gradient.cornerRadius = view.layer.cornerRadius > 0 ? view.layer.cornerRadius : 9
             gradient.masksToBounds = true
             view.layer.addSublayer(gradient)
             animationLayers.append(gradient)
-            
-            let gradientChangeAnimation = CABasicAnimation(keyPath: "locations")
-            gradientChangeAnimation.duration = 1
-            gradientChangeAnimation.repeatCount = .infinity
-            gradientChangeAnimation.fromValue = [0, 0.1, 0.3]
-            gradientChangeAnimation.toValue = [0, 0.8, 1]
-            gradientChangeAnimation.isRemovedOnCompletion = false
-            gradient.add(gradientChangeAnimation, forKey: "locationsChange")
+
+            let animation = CABasicAnimation(keyPath: "locations")
+            animation.fromValue = [-0.6, -0.3, 0.0]
+            animation.toValue   = [1.0, 1.3, 1.6]
+            animation.duration = 1.4
+            animation.timingFunction = CAMediaTimingFunction(name: .linear)
+            animation.repeatCount = .infinity
+            animation.isRemovedOnCompletion = false
+            gradient.add(animation, forKey: "shimmerLocations")
         }
     }
     
     private func removeGradients() {
         animationLayers.forEach { $0.removeFromSuperlayer() }
         animationLayers.removeAll()
+    }
+
+    private func setSkeletonActive(_ on: Bool) {
+        if on {
+            addGradientLayer(to: [userPicImageView, personNameLabel, usernameLabel, profileDescriptionLabel])
+        } else {
+            removeGradients()
+        }
+        infoDidLoaded = !on
+//        userPicImageView.alpha = on ? 0 : 1
+//        personNameLabel.alpha = on ? 0 : 1
+//        usernameLabel.alpha = on ? 0 : 1
+//        profileDescriptionLabel.alpha = on ? 0 : 1
+        if on {
+            personNameLabel.textColor = view.backgroundColor
+            usernameLabel.textColor = view.backgroundColor
+            profileDescriptionLabel.textColor = view.backgroundColor
+        } else {
+            personNameLabel.textColor = UIColor(named: "YP White (iOS)")
+            usernameLabel.textColor = UIColor(named: "YP Gray (iOS)")
+            profileDescriptionLabel.textColor = UIColor(named: "YP White (iOS)")
+        }
+        let icon = on ? "stop.circle" : "sparkles"
+        debugSkeletonButton.setImage(UIImage(systemName: icon), for: .normal)
     }
 }
